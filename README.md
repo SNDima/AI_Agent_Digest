@@ -30,14 +30,16 @@
 ```
 ai-agent-digest/
 │
-├── sources/         # Code for fetching/parsing sources (TechCrunch, arXiv, etc.)
-├── storage/         # Logic for storing processed items
-├── config/          # Config files (sources, credentials)
-├── tests/           # Unit and integration tests
+├── sources/           # Fetching/parsing logic for each source (TechCrunch, arXiv, Hugging Face, etc.)
+├── processing/        # Filtering, deduplication, and summarization pipeline
+├── storage/           # Store processed content (JSON, DB, or file-based)
+├── delivery/          # Telegram integration & scheduling
+├── config/            # Config files (sources, credentials, schedule)
+├── tests/             # Unit & integration tests
 │
-├── main.py          # Entry point for running the agent
-├── requirements.txt # Project dependencies
-└── README.md        # This file
+├── main.py            # Entry point for running the agent
+├── requirements.txt   # Project dependencies
+└── README.md          # This file
 ```
 
 ## ⚡ Getting Started  
