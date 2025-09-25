@@ -4,3 +4,4 @@ python-telegram-bot   # For Telegram delivery (later)
 pytest                # For tests
 black                 # For code formatting
 python-dotenv         # For working with .env
+PyYAML                # For configuration (YAML parsing)

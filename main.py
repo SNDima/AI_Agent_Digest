@@ -1,22 +1,28 @@
 import logging
 from typing import List, Dict
 
-from sources import techcrunch
-from processing import filter
+from sources.loader import load_all_articles
+from processing import filters
 from storage import store
 from delivery import telegram
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(module)s:%(funcName)s:%(lineno)d - %(message)s"
+)
 
 
 def fetch_sources() -> List[Dict]:
     logging.info("Fetching sources...")
     items: List[Dict] = []
-    items.extend(techcrunch.fetch())
+    articles = load_all_articles("config/sources.yaml")
+    items.extend(articles)
     return items
 
 
 def process_content(items: List[Dict]) -> List[Dict]:
     logging.info("Processing content...")
-    filtered = filter.filter_items(items)
+    filtered = filters.filter_items(items)
     return filtered
 
 
@@ -31,16 +37,11 @@ def deliver_digest(items: List[Dict]) -> None:
 
 
 def main() -> None:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(module)s:%(funcName)s:%(lineno)d - %(message)s"
-    )
-
     logging.info("AI Agent Digest started")
 
     try:
-        items = fetch_sources()
-        processed = process_content(items)
+        articles = fetch_sources()
+        processed = process_content(articles)
         store_content(processed)
         deliver_digest(processed)
     except Exception as e:
