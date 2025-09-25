@@ -38,10 +38,14 @@ def main() -> None:
 
     logging.info("AI Agent Digest started")
 
-    items = fetch_sources()
-    processed = process_content(items)
-    store_content(processed)
-    deliver_digest(processed)
+    try:
+        items = fetch_sources()
+        processed = process_content(items)
+        store_content(processed)
+        deliver_digest(processed)
+    except Exception as e:
+        logging.error(f"Pipeline failed: {e}", exc_info=True)
+        raise # re-raise to stop execution
 
     logging.info("AI Agent Digest finished")
 
