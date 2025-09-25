@@ -28,16 +28,15 @@ def load_config(config_path: str) -> Dict:
 
 
 def fetch_rss_articles(url: str) -> List[Dict]:
-    """
-    Fetch articles from an RSS feed.
-    Returns a list of dicts with title, link, published date, summary, author, guid, and categories.
-    """
+    """Fetch articles from an RSS feed URL."""
     logger.info(f"Fetching RSS feed from {url}...")
-    
     feed = feedparser.parse(url)
 
-    if feed.bozo:  # bozo flag means parsing issue
-        logger.error(f"Error parsing feed: {feed.bozo_exception}")
+    if feed.bozo:
+        logger.warning(f"Parsing irregularity in feed {url}: {feed.bozo_exception}")
+
+    if not getattr(feed, "entries", None):
+        logger.error(f"No entries found in feed {url}")
         return []
 
     articles = []
