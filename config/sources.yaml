@@ -11,3 +11,7 @@ sources:
     type: rss
     url: "https://gizmodo.com/tech/artificial-intelligence/feed"
     enabled: true
+  - name: LangChain Blog
+    type: rss
+    url: "https://blog.langchain.com/rss/"
+    enabled: true
