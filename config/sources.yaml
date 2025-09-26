@@ -3,3 +3,11 @@ sources:
     type: rss
     url: "https://techcrunch.com/category/artificial-intelligence/feed/"
     enabled: true
+  - name: Ars Technica
+    type: rss
+    url: "https://arstechnica.com/ai/feed/"
+    enabled: true
+  - name: Gizmodo
+    type: rss
+    url: "https://gizmodo.com/tech/artificial-intelligence/feed"
+    enabled: true
