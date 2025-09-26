@@ -10,8 +10,8 @@
 
 ## 📌 Features (Current & Planned)  
 - ✅ Fetch content from **TechCrunch** (RSS).  
-- ⬜ Add support for **Ars Technica** (RSS).  
-- ⬜ Add support for **Gizmodo AI** (RSS).  
+- ✅ Add support for **Ars Technica** (RSS).  
+- ✅ Add support for **Gizmodo AI** (RSS).  
 - ⬜ Add support for **arXiv** (API).  
 - ⬜ Add support for **Hugging Face Blog** (RSS + scraping).  
 - ⬜ Store already-processed items to avoid duplicates.  
