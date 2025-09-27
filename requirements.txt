@@ -5,3 +5,5 @@ pytest                # For tests
 black                 # For code formatting
 python-dotenv         # For working with .env
 PyYAML                # For configuration (YAML parsing)
+pydantic              # For strongly typed models and validation
+python-dateutil       # For parsing dates from RSS feeds

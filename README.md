@@ -11,19 +11,19 @@
 ## 📌 Features (Current & Planned)  
 - ✅ Fetch content from **TechCrunch** (RSS).  
 - ✅ Add support for **Ars Technica** (RSS).  
-- ✅ Add support for **Gizmodo AI** (RSS).
-- ✅ Add support for **LangChain Blog** (RSS). 
-- ⬜ Add support for **arXiv** (API).  
-- ⬜ Add support for **Hugging Face Blog** (RSS + scraping).  
-- ⬜ Store already-processed items to avoid duplicates.  
+- ✅ Add support for **Gizmodo AI** (RSS).  
+- ✅ Add support for **LangChain Blog** (RSS).   
+- ⬜ Store already-processed items in **SQLite** to avoid duplicates.  
 - ⬜ Summarize articles with LLM.  
 - ⬜ Automatic posting to Telegram.  
+- ⬜ Add support for **arXiv** (API).  
+- ⬜ Add support for **Hugging Face Blog** (RSS + scraping). 
 - ⬜ Error handling, retries, and monitoring.  
 
 ## 🛠️ Tech Stack  
 - **Language**: Python 3.11+  
 - **Content Sources**: RSS, APIs, Web scraping  
-- **Storage**: SQLite / JSON (to be finalized)  
+- **Storage**: SQLite (migrations tracked in `db/migrations/`)  
 - **Delivery**: Telegram Bot API  
 - **Summarization**: Large Language Models (LLMs)  
 
@@ -32,10 +32,14 @@
 ai-agent-digest/
 │
 ├── sources/           # Fetching/parsing logic for each source (TechCrunch, arXiv, Hugging Face, etc.)
+├── models/            # Strongly typed models (Pydantic)
 ├── processing/        # Filtering, deduplication, and summarization pipeline
-├── storage/           # Store processed content (JSON, DB, or file-based)
+├── storage/           # SQLite integration and helper functions
 ├── delivery/          # Telegram integration & scheduling
 ├── config/            # Config files (sources, credentials, schedule)
+├── db/                # Database migrations and migration runner
+│   ├── migrations/    # SQL migration scripts (001_init.sql, 002_*.sql, ...)
+│   └── migrate.py     # Migration runner (applies all migrations automatically)
 ├── tests/             # Unit & integration tests
 │
 ├── main.py            # Entry point for running the agent
@@ -55,10 +59,24 @@ ai-agent-digest/
    source venv/bin/activate   # On Windows use venv\Scripts\activate
    pip install -r requirements.txt
    ```
-3. Run the agent (currently only TechCrunch RSS):  
+3. Initialize or update the SQLite database (applies all migrations):  
+   ```bash
+   python db/migrate.py
+   ```
+4. Run the agent:  
    ```bash
    python main.py
    ```
+
+## 🗄 Database Migration Workflow  
+- All schema changes are tracked as **SQL migration scripts** in `db/migrations/`.  
+- Each migration file must follow the naming pattern: `NNN_description.sql` (e.g., `002_add_processed_flag.sql`).  
+- Use the migration runner to apply all pending migrations:  
+  ```bash
+  python db/migrate.py
+  ```
+- The runner keeps track of applied migrations in a `schema_migrations` table.  
+- Do **not** commit the database file itself (`digest.db`). Add it to `.gitignore`.   
 
 ## 📖 Configuration  
 - Sources are defined in a config file (`config/sources.yaml`).  

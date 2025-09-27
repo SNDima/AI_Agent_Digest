@@ -3,6 +3,8 @@ import logging
 from typing import List, Dict
 import yaml
 from pathlib import Path
+from dateutil import parser as date_parser
+from models.article import Article
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +29,7 @@ def load_config(config_path: str) -> Dict:
     return config
 
 
-def fetch_rss_articles(url: str) -> List[Dict]:
+def fetch_rss_articles(url: str, source_name: str) -> List[Article]:
     """Fetch articles from an RSS feed URL."""
     logger.info(f"Fetching RSS feed from {url}...")
     feed = feedparser.parse(url)
@@ -41,29 +43,39 @@ def fetch_rss_articles(url: str) -> List[Dict]:
 
     articles = []
     for entry in feed.entries:
-        article = {
-            "guid": getattr(entry, "id", None),
-            "title": entry.title,
-            "link": entry.link,
-            "published": getattr(entry, "published", None),
-            "summary": getattr(entry, "summary", None),
-            "author": getattr(entry, "author", None),
-            "categories": [tag.term for tag in getattr(entry, "tags", [])],
-        }
+        # Parse published date if available
+        published_at = None
+        if hasattr(entry, 'published'):
+            try:
+                published_at = date_parser.parse(entry.published)
+            except (ValueError, TypeError):
+                logger.warning(f"Could not parse published date: {entry.published}")
+        
+        # Create Article object
+        article = Article(
+            guid=getattr(entry, "id", entry.link),  # fallback to link if no id
+            source=source_name,
+            title=entry.title,
+            link=entry.link,
+            summary=getattr(entry, "summary", None),
+            author=getattr(entry, "author", None),
+            categories=[tag.term for tag in getattr(entry, "tags", [])],
+            published_at=published_at
+        )
         articles.append(article)
-        logger.debug(f"Fetched article: {article}")
+        logger.debug(f"Fetched article: {article.title}")
 
     logger.info(f"Fetched {len(articles)} articles from {url}.")
     return articles
 
 
-def load_all_articles(config_path: str) -> List[Dict]:
+def load_all_articles(config_path: str) -> List[Article]:
     """
     Load articles from all enabled sources defined in the config.
     Returns a flat list of article dictionaries.
     """
     config = load_config(config_path)
-    all_articles: List[Dict] = []
+    all_articles: List[Article] = []
 
     for source in config["sources"]:
         if not source.get("enabled", False):
@@ -71,9 +83,10 @@ def load_all_articles(config_path: str) -> List[Dict]:
 
         source_type = source.get("type")
         url = source.get("url")
+        source_name = source.get("name")
 
         if source_type == "rss" and url:
-            articles = fetch_rss_articles(url)
+            articles = fetch_rss_articles(url, source_name)
             all_articles.extend(articles)
         else:
             logger.warning(f"Unsupported source type or missing URL: {source}")
@@ -96,4 +109,4 @@ if __name__ == "__main__":
         raise
 
     for a in articles[:3]:  # print first 3
-        print(f"- {a['title']} ({a['link']}) by {a['author']} [{', '.join(a['categories'])}]")
+        print(f"- {a.title} ({a.link}) by {a.author}")

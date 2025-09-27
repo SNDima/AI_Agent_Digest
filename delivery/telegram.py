@@ -1,12 +1,13 @@
 import logging
 import os
-from typing import List, Dict
+from typing import List
 from dotenv import load_dotenv
+from models.article import Article
 
 # Load environment variables from .env file
 load_dotenv()
 
-def send(items: List[Dict]) -> None:
+def send(items: List[Article]) -> None:
     """
     Placeholder for sending digest to Telegram.
     Currently just prints info.

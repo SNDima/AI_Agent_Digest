@@ -1,7 +1,8 @@
 import logging
-from typing import List, Dict
+from typing import List
 
 from sources.loader import load_all_articles
+from models.article import Article
 from processing import filters
 from storage import store
 from delivery import telegram
@@ -12,26 +13,24 @@ logging.basicConfig(
 )
 
 
-def fetch_sources() -> List[Dict]:
+def fetch_sources() -> List[Article]:
     logging.info("Fetching sources...")
-    items: List[Dict] = []
     articles = load_all_articles("config/sources.yaml")
-    items.extend(articles)
-    return items
+    return articles
 
 
-def process_content(items: List[Dict]) -> List[Dict]:
+def process_content(items: List[Article]) -> List[Article]:
     logging.info("Processing content...")
     filtered = filters.filter_items(items)
     return filtered
 
 
-def store_content(items: List[Dict]) -> None:
+def store_content(items: List[Article]) -> None:
     logging.info("Storing content...")
     store.save(items)
 
 
-def deliver_digest(items: List[Dict]) -> None:
+def deliver_digest(items: List[Article]) -> None:
     logging.info("Delivering digest...")
     telegram.send(items)
 
