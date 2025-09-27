@@ -1,8 +1,7 @@
 import pytest
 from sources.loader import load_all_articles
 from models.article import Article
-
-CONFIG_PATH = "config/sources.yaml"
+from utils.constants import SOURCES_CONFIG_PATH
 
 
 class TestSources:
@@ -10,13 +9,13 @@ class TestSources:
 
     def test_fetch_returns_list(self):
         """Verify that load_all_articles returns a list of Article objects."""
-        items = load_all_articles(CONFIG_PATH)
+        items = load_all_articles(SOURCES_CONFIG_PATH)
         assert isinstance(items, list)
         assert all(isinstance(item, Article) for item in items)
 
     def test_items_have_required_fields(self):
         """Check that each fetched item has the expected Article fields."""
-        items = load_all_articles(CONFIG_PATH)
+        items = load_all_articles(SOURCES_CONFIG_PATH)
         for item in items:
             assert hasattr(item, 'guid')
             assert hasattr(item, 'title')
@@ -29,7 +28,7 @@ class TestSources:
 
     def test_categories_are_list(self):
         """Verify that categories field is always a list."""
-        items = load_all_articles(CONFIG_PATH)
+        items = load_all_articles(SOURCES_CONFIG_PATH)
         for item in items:
             assert isinstance(item.categories, list)
 

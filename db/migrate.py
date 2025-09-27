@@ -1,8 +1,7 @@
 import sqlite3
 import os
-
-DB_FILE = "digest.db"
-MIGRATIONS_DIR = "db/migrations"
+from utils.config import get_database_file
+from utils.constants import DATABASE_CONFIG_PATH, MIGRATIONS_DIR
 
 def get_applied_migrations(conn):
     conn.execute("""
@@ -20,8 +19,9 @@ def apply_migration(conn, filename, sql):
     conn.execute("INSERT INTO schema_migrations (filename) VALUES (?)", [filename])
     conn.commit()
 
-def main():
-    conn = sqlite3.connect(DB_FILE)
+def main(config_path: str):
+    db_file = get_database_file(config_path)
+    conn = sqlite3.connect(db_file)
     applied = get_applied_migrations(conn)
 
     migrations = sorted(os.listdir(MIGRATIONS_DIR))
@@ -34,4 +34,4 @@ def main():
     print("✅ All migrations applied.")
 
 if __name__ == "__main__":
-    main()
+    main(DATABASE_CONFIG_PATH)

@@ -6,6 +6,7 @@ from models.article import Article
 from processing import filters
 from storage import store
 from delivery import telegram
+from utils.constants import DATABASE_CONFIG_PATH, SOURCES_CONFIG_PATH
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,7 +16,7 @@ logging.basicConfig(
 
 def fetch_sources() -> List[Article]:
     logging.info("Fetching sources...")
-    articles = load_all_articles("config/sources.yaml")
+    articles = load_all_articles(SOURCES_CONFIG_PATH)
     return articles
 
 
@@ -27,7 +28,7 @@ def process_content(items: List[Article]) -> List[Article]:
 
 def store_content(items: List[Article]) -> None:
     logging.info("Storing content...")
-    store.save(items)
+    store.save(items, DATABASE_CONFIG_PATH)
 
 
 def deliver_digest(items: List[Article]) -> None:

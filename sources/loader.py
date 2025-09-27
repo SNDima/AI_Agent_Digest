@@ -1,32 +1,12 @@
 import feedparser
 import logging
 from typing import List, Dict
-import yaml
-from pathlib import Path
 from dateutil import parser as date_parser
 from models.article import Article
+from utils.config import get_sources_config
+from utils.constants import SOURCES_CONFIG_PATH
 
 logger = logging.getLogger(__name__)
-
-def load_config(config_path: str) -> Dict:
-    """Load YAML configuration file and validate it."""
-    path = Path(config_path)
-    if not path.exists():
-        raise FileNotFoundError(f"Config file not found: {config_path}")
-
-    with open(path, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-
-    if not config or "sources" not in config:
-        raise ValueError(f"Invalid config file: missing 'sources' key in {config_path}")
-
-    if not isinstance(config["sources"], list) or len(config["sources"]) == 0:
-        raise ValueError(f"Invalid config file: 'sources' must be a non-empty list in {config_path}")
-
-    if not any(source.get("enabled", False) for source in config["sources"]):
-        raise ValueError(f"Invalid config file: at least one source must be enabled in {config_path}")
-
-    return config
 
 
 def fetch_rss_articles(url: str, source_name: str) -> List[Article]:
@@ -74,7 +54,7 @@ def load_all_articles(config_path: str) -> List[Article]:
     Load articles from all enabled sources defined in the config.
     Returns a flat list of article dictionaries.
     """
-    config = load_config(config_path)
+    config = get_sources_config(config_path)
     all_articles: List[Article] = []
 
     for source in config["sources"]:
@@ -103,7 +83,7 @@ if __name__ == "__main__":
     )
 
     try:
-        articles = load_all_articles("config/sources.yaml")
+        articles = load_all_articles(SOURCES_CONFIG_PATH)
     except (FileNotFoundError, ValueError) as e:
         logger.critical(str(e))
         raise
