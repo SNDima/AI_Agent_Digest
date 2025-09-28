@@ -22,6 +22,7 @@ def apply_migration(conn, filename, sql):
 def main(config_path: str):
     db_file = get_database_file(config_path)
     conn = sqlite3.connect(db_file)
+    conn.row_factory = sqlite3.Row
     applied = get_applied_migrations(conn)
 
     migrations = sorted(os.listdir(MIGRATIONS_DIR))
