@@ -1,5 +1,6 @@
 import pytest
 from delivery import telegram
+from models.article import Article
 
 class TestTelegramDelivery:
     """Tests for Telegram delivery mechanism.
@@ -13,7 +14,13 @@ class TestTelegramDelivery:
     @pytest.fixture(autouse=True)
     def setup_method(self):
         """Set up test data that will be used by all tests."""
-        self.valid_item = {"title": "Test News", "content": "Test Content"}
+        self.valid_item = Article(
+            guid="test",
+            source="test",
+            title="Test News",
+            link="https://example.com",
+            summary="Test Content"
+        )
         self.valid_credentials = {
             "TELEGRAM_BOT_TOKEN": "test_token",
             "TELEGRAM_CHAT_ID": "test_chat_id"

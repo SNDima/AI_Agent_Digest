@@ -1,30 +1,36 @@
 import pytest
 from sources.loader import load_all_articles
-
-CONFIG_PATH = "config/sources.yaml"
+from models.article import Article
+from utils.constants import SOURCES_CONFIG_PATH
 
 
 class TestSources:
     """Tests for loading articles from sources defined in the config."""
 
     def test_fetch_returns_list(self):
-        """Verify that load_all_articles returns a list of dictionaries."""
-        items = load_all_articles(CONFIG_PATH)
+        """Verify that load_all_articles returns a list of Article objects."""
+        items = load_all_articles(SOURCES_CONFIG_PATH)
         assert isinstance(items, list)
-        assert all(isinstance(item, dict) for item in items)
+        assert all(isinstance(item, Article) for item in items)
 
-    def test_items_have_required_keys(self):
-        """Check that each fetched item has the expected fields."""
-        items = load_all_articles(CONFIG_PATH)
-        required_keys = {"guid", "title", "link", "published", "summary", "author", "categories"}
+    def test_items_have_required_fields(self):
+        """Check that each fetched item has the expected Article fields."""
+        items = load_all_articles(SOURCES_CONFIG_PATH)
         for item in items:
-            assert required_keys.issubset(item.keys())
+            assert hasattr(item, 'guid')
+            assert hasattr(item, 'title')
+            assert hasattr(item, 'link')
+            assert hasattr(item, 'source')
+            assert hasattr(item, 'categories')
+            assert hasattr(item, 'published_at')
+            assert hasattr(item, 'fetched_at')
+            assert hasattr(item, 'posted')
 
     def test_categories_are_list(self):
         """Verify that categories field is always a list."""
-        items = load_all_articles(CONFIG_PATH)
+        items = load_all_articles(SOURCES_CONFIG_PATH)
         for item in items:
-            assert isinstance(item["categories"], list)
+            assert isinstance(item.categories, list)
 
 
 class TestConfigValidation:

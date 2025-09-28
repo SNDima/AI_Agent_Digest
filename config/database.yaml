@@ -1,0 +1,6 @@
+database:
+  file: "digest.db"
+  # Additional database settings can be added here in the future:
+  # timeout: 30
+  # journal_mode: "WAL"
+  # synchronous: "NORMAL"
