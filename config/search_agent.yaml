@@ -1,0 +1,24 @@
+search_agent:
+  engine: google_news
+  freshness: last_24h
+  results_per_query: 10
+  schedule: daily
+  queries:
+    core:
+    - AI Agents
+    - AI agent frameworks
+    - multi-agent systems
+    - autonomous AI agents
+    ecosystem:
+    - LangChain agents
+    - AutoGen Microsoft agents
+    - CrewAI autonomous agents
+    - OpenAI agents
+    wildcard:
+    - AI agents latest news
+    default_scope:
+    - AI Agents
+    - LangChain agents
+    - autonomous AI agents
+    - multi-agent systems
+    - CrewAI OR AutoGen agents

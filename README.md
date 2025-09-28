@@ -24,6 +24,8 @@
 
 ## 🛠️ Tech Stack  
 - **Language**: Python 3.11+  
+- **Workflow**: LangGraph for orchestration
+- **AI Framework**: LangChain for tools and utilities
 - **Content Sources**: RSS, APIs, Web scraping  
 - **Storage**: SQLite (migrations tracked in `db/migrations/`)  
 - **Delivery**: Telegram Bot API  
@@ -55,6 +57,7 @@ ai-agent-digest/
 │
 ├── main.py            # Entry point for running the agent
 ├── requirements.txt   # Project dependencies
+├── .env.example       # Example environment variables file
 └── README.md          # This file
 ```
 
@@ -63,18 +66,24 @@ ai-agent-digest/
    ```bash
    git clone https://github.com/yourusername/ai-agent-digest.git
    cd ai-agent-digest
-   ```
+   ```  
 2. Create a virtual environment and install dependencies:  
    ```bash
    python -m venv venv
    source venv/bin/activate   # On Windows use venv\Scripts\activate
    pip install -r requirements.txt
+   ```  
+3. Set up environment variables:
+   ```bash
+   # Rename the example file and add your API keys
+   mv .env.example .env
+   # Then edit .env with your actual API keys
    ```
-3. Initialize or update the SQLite database (applies all migrations):  
+4. Initialize or update the SQLite database (applies all migrations):  
    ```bash
    python db/migrate.py
-   ```
-4. Run the agent:  
+   ```  
+5. Run the agent:  
    ```bash
    python main.py
    ```
@@ -90,6 +99,25 @@ ai-agent-digest/
 - Do **not** commit the database file itself (`digest.db`). Add it to `.gitignore`.   
 
 ## 📖 Configuration  
+
+### Environment Variables
+Rename `.env.example` to `.env` and add your API keys:
+
+```bash
+# Rename the example file
+mv .env.example .env
+
+# Then edit .env with your actual values
+```
+
+The `.env.example` file contains:
+```bash
+# Telegram Configuration (if using Telegram delivery)
+# TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+# TELEGRAM_CHAT_ID=your_telegram_chat_id_here
+
+# Add other API keys as needed for future features
+```
 
 ### Database Configuration (`config/database.yaml`)
 ```yaml
