@@ -16,6 +16,8 @@
 - ✅ Store already-processed items in **SQLite** to avoid duplicates.  
 - ✅ Configurable database settings via `config/database.yaml`.  
 - ✅ Batch database operations for improved performance.  
+- ✅ **Web search integration** with SerpAPI via LangChain for real-time AI agent news
+- ✅ **AI-powered summarization** using OpenAI via LangChain for search results
 - ⬜ Summarize articles with LLM.  
 - ⬜ Automatic posting to Telegram.  
 - ⬜ Add support for **arXiv** (API).  
@@ -27,9 +29,12 @@
 - **Workflow**: LangGraph for orchestration
 - **AI Framework**: LangChain for tools and utilities
 - **Content Sources**: RSS, APIs, Web scraping  
+- **Web Search**: SerpAPI via LangChain for real-time search results
+- **AI Summarization**: OpenAI GPT models via LangChain for content summarization
+- **Data Models**: Pydantic for type safety and validation
 - **Storage**: SQLite (migrations tracked in `db/migrations/`)  
 - **Delivery**: Telegram Bot API  
-- **Summarization**: Large Language Models (LLMs)  
+- **Summarization**: Large Language Models (LLMs)
 
 ## 📂 Project Structure  
 ```
@@ -37,17 +42,23 @@ ai-agent-digest/
 │
 ├── config/            # Configuration files (YAML)
 │   ├── database.yaml  # Database configuration
-│   └── sources.yaml   # RSS sources configuration
+│   ├── sources.yaml   # RSS sources configuration
+│   └── search_agent.yaml # Search agent configuration
 ├── utils/             # Shared utility functions
 │   └── config.py      # Configuration loading utilities
 ├── sources/           # Fetching/parsing logic for each source
 │   └── loader.py      # RSS feed loading and parsing
+├── search/            # Web search and summarization functionality
+│   └── agent.py       # Search agent with SerpAPI integration
 ├── models/            # Strongly typed models (Pydantic)
-│   └── article.py     # Article data model
+│   ├── article.py     # Article data model for RSS feeds
+│   ├── search_result.py # Search result model for web search results
+│   └── search_summary.py # Search summary model for AI-generated summaries
 ├── processing/        # Filtering, deduplication, and summarization pipeline
 │   └── filters.py     # Content filtering logic
 ├── storage/           # SQLite integration and helper functions
-│   └── store.py       # Database storage with batch operations
+│   ├── article_storage.py # Database operations for RSS articles
+│   └── summary_storage.py # Database operations for search summaries
 ├── delivery/          # Telegram integration & scheduling
 │   └── telegram.py    # Telegram bot integration
 ├── db/                # Database migrations and migration runner
@@ -72,7 +83,9 @@ ai-agent-digest/
    python -m venv venv
    source venv/bin/activate   # On Windows use venv\Scripts\activate
    pip install -r requirements.txt
-   ```  
+   ```
+   
+   **Note**: The `requirements.txt` uses compatible version pinning (`~=`) for stability while allowing patch updates.  
 3. Set up environment variables:
    ```bash
    # Rename the example file and add your API keys
@@ -81,7 +94,7 @@ ai-agent-digest/
    ```
 4. Initialize or update the SQLite database (applies all migrations):  
    ```bash
-   python db/migrate.py
+   python -m db.migrate
    ```  
 5. Run the agent:  
    ```bash
@@ -93,7 +106,7 @@ ai-agent-digest/
 - Each migration file must follow the naming pattern: `NNN_description.sql` (e.g., `002_add_processed_flag.sql`).  
 - Use the migration runner to apply all pending migrations:  
   ```bash
-  python db/migrate.py
+  python -m db.migrate
   ```
 - The runner keeps track of applied migrations in a `schema_migrations` table.  
 - Do **not** commit the database file itself (`digest.db`). Add it to `.gitignore`.   
@@ -108,15 +121,6 @@ Rename `.env.example` to `.env` and add your API keys:
 mv .env.example .env
 
 # Then edit .env with your actual values
-```
-
-The `.env.example` file contains:
-```bash
-# Telegram Configuration (if using Telegram delivery)
-# TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
-# TELEGRAM_CHAT_ID=your_telegram_chat_id_here
-
-# Add other API keys as needed for future features
 ```
 
 ### Database Configuration (`config/database.yaml`)
@@ -144,7 +148,7 @@ sources:
 - **Explicit configuration paths** - no hidden defaults
 - **Validation** with clear error messages
 - **Flexible database location** for different environments
-- **Easy source management** - enable/disable sources individually  
+- **Easy source management** - enable/disable sources individually
 
 ## 📜 License  
 This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.  
