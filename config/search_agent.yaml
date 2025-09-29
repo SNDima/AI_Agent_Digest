@@ -1,0 +1,34 @@
+search_agent:
+  engine: google_news
+  freshness: last_24h
+  results_per_query: 5
+  max_results_for_summary: 25
+  schedule: daily
+  search_time_utc: "18:00"
+  chat_model:
+    model: "gpt-4.1"
+    model_provider: "openai"
+    temperature: 0.3
+  summary_prompt: |
+    Please provide an engaging summary of the following search results for the query "{query}".
+    Focus on the most trending, interesting, and newsworthy information that would be compelling to read.
+    Highlight:
+    - Breaking news and recent developments
+    - Controversial or surprising findings
+    - Industry trends and emerging patterns
+    - Expert opinions and insights
+    - Future implications and predictions
+    
+    Make the summary engaging and informative, emphasizing what makes each piece of information particularly interesting or significant.
+    
+    Search Results:
+    {content_text}
+    
+    Summary:
+  system_message: "You are a skilled content curator and trend analyst who creates engaging summaries by identifying the most interesting, trending, and newsworthy information from search results. You excel at highlighting what makes information compelling and significant."
+  queries:
+  - AI Agents
+  - LangChain agents
+  - autonomous AI agents
+  - multi-agent systems
+  - CrewAI OR AutoGen agents

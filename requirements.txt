@@ -1,9 +1,13 @@
-requests              # For fetching RSS/APIs
-feedparser            # For parsing RSS feeds
-python-telegram-bot   # For Telegram delivery (later)
-pytest                # For tests
-black                 # For code formatting
-python-dotenv         # For working with .env
-PyYAML                # For configuration (YAML parsing)
-pydantic              # For strongly typed models and validation
-python-dateutil       # For parsing dates from RSS feeds
+requests~=2.32              # For fetching RSS/APIs
+feedparser~=6.0             # For parsing RSS feeds
+python-telegram-bot~=22.4   # For Telegram delivery
+pytest~=8.4                 # For tests
+black~=25.9                 # For code formatting
+python-dotenv~=1.1          # For working with .env
+PyYAML~=6.0                 # For configuration (YAML parsing)
+pydantic~=2.11              # For strongly typed models and validation
+python-dateutil~=2.9        # For parsing dates from RSS feeds
+langgraph~=0.6              # For workflow orchestration
+langchain-core~=0.3         # For LangChain core functionality
+langchain~=0.3              # For LangChain tools
+langchain-community~=0.3    # For community tools including SerpAPI
