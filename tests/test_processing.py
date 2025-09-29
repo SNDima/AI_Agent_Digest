@@ -1,4 +1,4 @@
-from processing import filters
+from processing import scoring
 from models.article import Article
 from datetime import datetime
 
@@ -23,9 +23,9 @@ class TestContentFilter:
                 summary="Other content"
             )
         ]
-        filtered = filters.filter_items(sample_items)
-        assert isinstance(filtered, list)
-        assert all(isinstance(item, Article) for item in filtered)
-        assert len(filtered) == 2
-        assert filtered[0].title == "AI News"
-        assert filtered[1].title == "Other News"
+        scored = scoring.assign_relevance_score(sample_items)
+        assert isinstance(scored, list)
+        assert all(isinstance(item, Article) for item in scored)
+        assert len(scored) == 2
+        assert scored[0].title == "AI News"
+        assert scored[1].title == "Other News"

@@ -9,7 +9,7 @@ from sources.loader import load_all_articles
 from models.article import Article
 from models.search_result import SearchResult
 from models.search_summary import SearchSummary
-from processing import filters
+from processing import scoring
 from storage import article_storage
 from delivery import telegram
 from search.agent import SearchAgent
@@ -72,24 +72,24 @@ def store_content_node(state: DigestState) -> DigestState:
         }
 
 
-def process_content_node(state: DigestState) -> DigestState:
-    """Process and filter articles."""
-    logging.info("Processing content...")
+def score_content_node(state: DigestState) -> DigestState:
+    """Score articles for relevance."""
+    logging.info("Scoring content...")
     try:
         if state.get("error"):
             return state
             
-        filtered = filters.filter_items(state["articles"])
+        scored_articles = scoring.assign_relevance_score(state["articles"])
         return {
             **state,
-            "filtered_articles": filtered
+            "filtered_articles": scored_articles
         }
     except Exception as e:
-        logging.error(f"Failed to process content: {e}")
+        logging.error(f"Failed to score content: {e}")
         return {
             **state,
             "filtered_articles": [],
-            "error": f"Failed to process content: {e}"
+            "error": f"Failed to score content: {e}"
         }
 
 
@@ -237,7 +237,6 @@ def create_digest_workflow() -> StateGraph:
     # Add nodes
     workflow.add_node("fetch", fetch_sources_node)
     workflow.add_node("store", store_content_node)
-    workflow.add_node("process", process_content_node)
     workflow.add_node("fetch_summary", fetch_last_summary_node)
     workflow.add_node("search", search_node)
     workflow.add_node("summarize", summarize_node)
@@ -255,14 +254,14 @@ def create_digest_workflow() -> StateGraph:
         search_condition_router,
         {
             "search": "search",
-            "process": "process"
+            "process": "score"
         }
     )
     
     workflow.add_edge("search", "summarize")
     workflow.add_edge("summarize", "save_summary")
-    workflow.add_edge("save_summary", "process")
-    workflow.add_edge("process", "deliver")
+    workflow.add_edge("save_summary", "score")
+    workflow.add_edge("score", "deliver")
     workflow.add_edge("deliver", END)
     
     return workflow.compile()
