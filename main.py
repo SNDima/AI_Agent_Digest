@@ -9,6 +9,7 @@ from models.article import Article
 from models.search_summary import SearchSummary
 from processing import scoring
 from processing.filtering import filter_top_articles
+from processing.post_creator import PostCreator
 from storage import article_storage
 from storage.article_storage import get_articles_after, update_relevance_scores
 from delivery import telegram
@@ -16,7 +17,7 @@ from search.agent import SearchAgent
 from storage.summary_storage import save_search_summary
 from storage.delivery_storage import save_delivery, get_latest_delivery
 from models.delivery import Delivery
-from utils.constants import DATABASE_CONFIG_PATH, SOURCES_CONFIG_PATH, SEARCH_AGENT_CONFIG_PATH, DELIVERY_CONFIG_PATH
+from utils.constants import DATABASE_CONFIG_PATH, SOURCES_CONFIG_PATH, SEARCH_AGENT_CONFIG_PATH, DELIVERY_CONFIG_PATH, POST_CREATOR_CONFIG_PATH
 from utils.config import load_config
 from utils.time_utils import should_run_delivery, parse_articles_freshness
 
@@ -146,12 +147,17 @@ def deliver_digest_node(state: DigestState) -> DigestState:
         # Step 5: Filter and select top articles
         top_articles = filter_top_articles(scored_articles)
         
-        # Step 6: Deliver digest via Telegram
-        logging.info("Delivering digest...")
-        telegram.send(top_articles)
+        # Step 6: Create engaging post using LLM
+        logging.info("Creating social media post...")
+        post_creator = PostCreator(POST_CREATOR_CONFIG_PATH)
+        post_text = post_creator.create_post(top_articles)
         
-        # Step 7: Save delivery record
-        delivery = Delivery(content=summary_text)
+        # Step 7: Deliver digest via Telegram
+        logging.info("Delivering digest...")
+        telegram.send(post_text)
+        
+        # Step 8: Save delivery record
+        delivery = Delivery(content=post_text)
         save_delivery(delivery, DATABASE_CONFIG_PATH)
         
         return state

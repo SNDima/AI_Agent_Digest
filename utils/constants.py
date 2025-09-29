@@ -6,6 +6,7 @@ SOURCES_CONFIG_PATH = "config/sources.yaml"
 SEARCH_AGENT_CONFIG_PATH = "config/search_agent.yaml"
 DELIVERY_CONFIG_PATH = "config/delivery.yaml"
 SCORING_CONFIG_PATH = "config/scoring.yaml"
+POST_CREATOR_CONFIG_PATH = "config/post_creator.yaml"
 
 # Database settings
 MIGRATIONS_DIR = "db/migrations"
