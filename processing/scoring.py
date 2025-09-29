@@ -135,5 +135,5 @@ def assign_relevance_score(articles: List[Article], relevance_text: str) -> List
         
     except Exception as e:
         logging.error(f"Failed to assign relevance scores: {e}")
-        # Return articles unchanged if scoring fails
-        return articles
+        # Raise the exception instead of returning articles unchanged
+        raise e
