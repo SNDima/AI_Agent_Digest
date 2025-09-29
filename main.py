@@ -1,15 +1,16 @@
 import logging
-from typing import TypedDict
-from datetime import datetime, timedelta
+from typing import List, TypedDict
 
 from langgraph.graph import StateGraph, START, END
 from dotenv import load_dotenv
 
 from sources.loader import load_all_articles
+from models.article import Article
 from models.search_summary import SearchSummary
 from processing import scoring
+from processing.filtering import filter_top_articles
 from storage import article_storage
-from storage.article_storage import get_articles_after
+from storage.article_storage import get_articles_after, update_relevance_scores
 from delivery import telegram
 from search.agent import SearchAgent
 from storage.summary_storage import save_search_summary
@@ -76,6 +77,18 @@ def delivery_condition_router(state: DigestState) -> str:
         return "END"
 
 
+def _get_fresh_articles() -> List[Article]:
+    """Private function to get fresh articles based on articles_freshness config."""
+    logging.info("Getting fresh articles...")
+    delivery_config = load_config(DELIVERY_CONFIG_PATH)
+    articles_freshness = delivery_config["delivery"]["articles_freshness"]
+    cutoff_datetime = parse_articles_freshness(articles_freshness)
+    
+    fresh_articles = get_articles_after(DATABASE_CONFIG_PATH, cutoff_datetime)
+    
+    return fresh_articles
+
+
 def _make_summary() -> str | None:
     """Private function to create and save a new summary."""
     logging.info("Making new summary...")
@@ -113,29 +126,31 @@ def deliver_digest_node(state: DigestState) -> DigestState:
         if state.get("error"):
             return state
         
-        # Step 1: Get fresh articles based on articles_freshness
-        logging.info("Getting fresh articles...")
-        delivery_config = load_config(DELIVERY_CONFIG_PATH)
-        articles_freshness = delivery_config["delivery"]["articles_freshness"]
-        cutoff_datetime = parse_articles_freshness(articles_freshness)
-        
-        fresh_articles = get_articles_after(DATABASE_CONFIG_PATH, cutoff_datetime)
-        logging.info(f"Found {len(fresh_articles)} fresh articles")
-        
-        # Step 2: Score articles for relevance
-        logging.info("Scoring content...")
-        scored_articles = scoring.assign_relevance_score(fresh_articles)
-        
-        # Step 3: Make summary using private function
+        # Step 1: Make summary using private function
         summary_text = _make_summary()
         if not summary_text:
             return state
+
+        # Step 2: Get fresh articles based on articles_freshness
+        fresh_articles = _get_fresh_articles()
+        logging.info(f"Found {len(fresh_articles)} fresh articles")
         
-        # Step 4: Deliver digest via Telegram
+        # Step 3: Score articles for relevance
+        logging.info("Scoring content...")
+        scored_articles = scoring.assign_relevance_score(fresh_articles, summary_text)
+        
+        # Step 4: Save relevance scores to database
+        logging.info("Saving relevance scores to database...")
+        update_relevance_scores(scored_articles, DATABASE_CONFIG_PATH)
+        
+        # Step 5: Filter and select top articles
+        top_articles = filter_top_articles(scored_articles)
+        
+        # Step 6: Deliver digest via Telegram
         logging.info("Delivering digest...")
-        telegram.send(scored_articles)
+        telegram.send(top_articles)
         
-        # Step 5: Save delivery record
+        # Step 7: Save delivery record
         delivery = Delivery(content=summary_text)
         save_delivery(delivery, DATABASE_CONFIG_PATH)
         
@@ -148,7 +163,7 @@ def deliver_digest_node(state: DigestState) -> DigestState:
         }
 
 
-def create_digest_workflow() -> StateGraph:
+def _create_digest_workflow() -> StateGraph:
     """Create the LangGraph workflow for the digest pipeline."""
     workflow = StateGraph(DigestState)
     
@@ -179,7 +194,7 @@ def main() -> None:
 
     try:
         # Create and run the workflow with LangSmith tracing
-        workflow = create_digest_workflow()
+        workflow = _create_digest_workflow()
         
         # Initialize state
         initial_state = DigestState(

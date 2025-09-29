@@ -1,40 +1,43 @@
 # AI Agent Digest  
 
-**AI Agent Digest** is a daily automated assistant that collects, filters, and summarizes the most important news, research, and updates in the field of AI Agents. Summaries are posted automatically to a dedicated [Telegram channel](#) every evening.  
+**AI Agent Digest** is an intelligent daily automated assistant that collects, scores, filters, and summarizes the most important news, research, and updates in the field of AI Agents. Using advanced LLM-based relevance scoring and smart filtering, it delivers high-quality content summaries to a dedicated Telegram channel every evening.  
 
 ## 🚀 Overview  
-- Collects content from trusted sources (news sites, blogs, research portals).  
-- Filters content to keep only AI Agent–related updates.  
-- Generates clear and concise summaries with links to original articles.  
-- Publishes digest to Telegram on a reliable schedule.  
+- **Smart Collection**: Gathers content from trusted RSS sources and real-time web search
+- **AI-Powered Scoring**: Uses LLM to score article relevance (1-100) for AI agent content
+- **Intelligent Filtering**: Automatically selects top articles based on relevance scores
+- **AI Summarization**: Generates clear and concise summaries using OpenAI GPT models
+- **Automated Delivery**: Publishes curated digest to Telegram on a reliable schedule  
 
 ## 📌 Features (Current & Planned)  
-- ✅ Fetch content from **TechCrunch** (RSS).  
-- ✅ Add support for **Ars Technica** (RSS).  
-- ✅ Add support for **Gizmodo AI** (RSS).  
-- ✅ Add support for **LangChain Blog** (RSS).   
-- ✅ Store already-processed items in **SQLite** to avoid duplicates.  
-- ✅ Configurable database settings via `config/database.yaml`.  
-- ✅ Batch database operations for improved performance.  
-- ✅ **Web search integration** with SerpAPI via LangChain for real-time AI agent news
-- ✅ **AI-powered summarization** using OpenAI via LangChain for search results
-- ⬜ Summarize articles with LLM.  
-- ⬜ Automatic posting to Telegram.  
-- ⬜ Add support for **arXiv** (API).  
-- ⬜ Add support for **Hugging Face Blog** (RSS + scraping). 
-- ⬜ Error handling, retries, and monitoring.  
+- ✅ **RSS Content Collection** from multiple sources (TechCrunch, Ars Technica, Gizmodo AI, LangChain Blog)
+- ✅ **Real-time Web Search** with SerpAPI via LangChain for latest AI agent news
+- ✅ **AI-Powered Summarization** using OpenAI GPT models for search results
+- ✅ **LLM-Based Relevance Scoring** (1-100 scale) for intelligent content filtering
+- ✅ **Smart Article Filtering** with configurable selection criteria (top 3-5 articles)
+- ✅ **Structured Output Processing** using Pydantic models for reliable data handling
+- ✅ **SQLite Database** with migration system for persistent storage
+- ✅ **Batch Operations** for improved performance and reliability
+- ✅ **Modular Configuration** with separate YAML files for each component
+- ✅ **Telegram Integration** for automated digest delivery
+- ✅ **Comprehensive Testing** with unit tests for all major components
+- ⬜ **arXiv API Integration** for research paper collection
+- ⬜ **Hugging Face Blog** support (RSS + scraping)
+- ⬜ **Advanced Analytics** (engagement tracking, click metrics)
+- ⬜ **Multi-language Support** for international content  
 
 ## 🛠️ Tech Stack  
 - **Language**: Python 3.11+  
-- **Workflow**: LangGraph for orchestration
+- **Workflow**: LangGraph for intelligent orchestration
 - **AI Framework**: LangChain for tools and utilities
-- **Content Sources**: RSS, APIs, Web scraping  
+- **Content Sources**: RSS feeds, Web search APIs
 - **Web Search**: SerpAPI via LangChain for real-time search results
-- **AI Summarization**: OpenAI GPT models via LangChain for content summarization
+- **AI Processing**: OpenAI GPT-4 models for summarization and scoring
+- **Structured Output**: Pydantic models with `with_structured_output` for reliable data handling
 - **Data Models**: Pydantic for type safety and validation
-- **Storage**: SQLite (migrations tracked in `db/migrations/`)  
+- **Storage**: SQLite with migration system (`db/migrations/`)  
 - **Delivery**: Telegram Bot API  
-- **Summarization**: Large Language Models (LLMs)
+- **Configuration**: YAML-based modular configuration system
 
 ## 📂 Project Structure  
 ```
@@ -43,34 +46,66 @@ ai-agent-digest/
 ├── config/            # Configuration files (YAML)
 │   ├── database.yaml  # Database configuration
 │   ├── sources.yaml   # RSS sources configuration
-│   └── search_agent.yaml # Search agent configuration
+│   ├── search_agent.yaml # Search agent configuration
+│   ├── scoring.yaml   # Relevance scoring configuration
+│   └── delivery.yaml  # Delivery configuration
 ├── utils/             # Shared utility functions
-│   └── config.py      # Configuration loading utilities
-├── sources/           # Fetching/parsing logic for each source
+│   ├── config.py      # Configuration loading utilities
+│   ├── constants.py   # Configuration path constants
+│   └── time_utils.py  # Time-based utility functions
+├── sources/           # Content fetching and parsing
 │   └── loader.py      # RSS feed loading and parsing
-├── search/            # Web search and summarization functionality
+├── search/            # Web search and summarization
 │   └── agent.py       # Search agent with SerpAPI integration
-├── models/            # Strongly typed models (Pydantic)
-│   ├── article.py     # Article data model for RSS feeds
-│   ├── search_result.py # Search result model for web search results
-│   └── search_summary.py # Search summary model for AI-generated summaries
-├── processing/        # Filtering, deduplication, and summarization pipeline
-│   └── filters.py     # Content filtering logic
-├── storage/           # SQLite integration and helper functions
-│   ├── article_storage.py # Database operations for RSS articles
-│   └── summary_storage.py # Database operations for search summaries
-├── delivery/          # Telegram integration & scheduling
+├── models/            # Data models (Pydantic)
+│   ├── article.py     # Article model with relevance scoring
+│   ├── search_result.py # Search result model
+│   ├── search_summary.py # Search summary model
+│   └── delivery.py    # Delivery model
+├── processing/        # Content processing pipeline
+│   ├── scoring.py     # LLM-based relevance scoring
+│   └── filtering.py   # Smart article filtering
+├── storage/           # Database operations
+│   ├── article_storage.py # Article database operations
+│   ├── summary_storage.py # Summary database operations
+│   └── delivery_storage.py # Delivery database operations
+├── delivery/          # Telegram integration
 │   └── telegram.py    # Telegram bot integration
-├── db/                # Database migrations and migration runner
-│   ├── migrations/    # SQL migration scripts (001_init.sql, 002_*.sql, ...)
-│   └── migrate.py     # Migration runner (applies all migrations automatically)
-├── tests/             # Unit & integration tests
-│
-├── main.py            # Entry point for running the agent
+├── db/                # Database migrations
+│   ├── migrations/    # SQL migration scripts
+│   └── migrate.py     # Migration runner
+├── tests/             # Comprehensive test suite
+│   ├── test_time_utils.py
+│   ├── test_config.py
+│   └── ...            # Additional test files
+├── main.py            # Main workflow orchestration
 ├── requirements.txt   # Project dependencies
-├── .env.example       # Example environment variables file
+├── .env.example       # Environment variables template
 └── README.md          # This file
 ```
+
+## 🔄 Workflow Overview
+
+The AI Agent Digest follows a sophisticated 7-step workflow:
+
+1. **📥 Content Collection**: Fetches articles from RSS sources and stores them in SQLite
+2. **🔍 Web Search**: Performs real-time web searches for AI agent news using SerpAPI
+3. **🤖 AI Summarization**: Generates comprehensive summaries using OpenAI GPT models
+4. **📊 Relevance Scoring**: Uses LLM to score each article (1-100) for AI agent relevance
+5. **💾 Database Update**: Saves relevance scores to the database for persistence
+6. **🎯 Smart Filtering**: Selects top 3-5 articles based on relevance scores
+7. **📱 Telegram Delivery**: Publishes curated digest to Telegram channel
+
+### 🧠 AI-Powered Scoring System
+
+The relevance scoring system uses advanced LLM capabilities:
+
+- **Intelligent Criteria**: Scores based on AI agent relevance, technical depth, and recency
+- **Smart Filtering**: 
+  - If ≥5 articles score >80: Selects top 5
+  - If <5 articles score >80: Selects top 3
+- **Reasoning Capture**: Captures LLM reasoning for each score
+
 
 ## ⚡ Getting Started  
 1. Clone the repository:  
@@ -108,8 +143,7 @@ ai-agent-digest/
   ```bash
   python -m db.migrate
   ```
-- The runner keeps track of applied migrations in a `schema_migrations` table.  
-- Do **not** commit the database file itself (`digest.db`). Add it to `.gitignore`.   
+- The runner keeps track of applied migrations in a `schema_migrations` table.   
 
 ## 📖 Configuration  
 
@@ -143,12 +177,39 @@ sources:
   # ... more sources
 ```
 
+### Scoring Configuration (`config/scoring.yaml`)
+```yaml
+scoring:
+  chat_model:
+    model: "gpt-4.1"
+    model_provider: "openai"
+    temperature: 0.1
+  scoring_prompt: |
+    You are an expert content curator for an AI Agent Digest newsletter...
+  system_message: "You are an expert AI content curator..."
+```
+
+### Search Agent Configuration (`config/search_agent.yaml`)
+```yaml
+search_agent:
+  engine: google_news
+  freshness: last_24h
+  results_per_query: 5
+  queries:
+    - AI Agents
+    - LangChain agents
+    - autonomous AI agents
+    - multi-agent systems
+    - CrewAI OR AutoGen agents
+```
+
 ### Configuration Features
-- **Separate config files** for database and sources
-- **Explicit configuration paths** - no hidden defaults
-- **Validation** with clear error messages
-- **Flexible database location** for different environments
-- **Easy source management** - enable/disable sources individually
+- **Modular Configuration**: Separate YAML files for each component
+- **Environment Variables**: Secure API key management via `.env`
+- **Validation**: Pydantic models ensure configuration integrity
+- **Flexible Database**: Configurable database location for different environments
+- **Source Management**: Enable/disable sources individually
+- **AI Customization**: Configurable LLM models and parameters
 
 ## 📜 License  
 This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.  
@@ -157,6 +218,5 @@ This project is licensed under the **MIT License** – see the [LICENSE](LICENSE
 Contributions are welcome! Please open an issue or submit a pull request if you’d like to help improve the project.  
 
 ## 🌟 Future Enhancements  
-- Engagement analytics (link clicks, most-read topics).  
-- Multi-language support.  
-- Cloud deployment (Docker, serverless, etc.).  
+- **Advanced Analytics**: Engagement tracking, click metrics, read time analysis
+- **Cloud Deployment**: Docker containers, serverless functions

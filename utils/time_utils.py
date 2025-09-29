@@ -31,6 +31,19 @@ def was_search_run_today(last_datetime: Optional[datetime]) -> bool:
     
     today = datetime.now(timezone.utc).date()
     return last_datetime.date() == today
+    """Check if search should run based on date and time conditions."""
+    # Check if search was already run today
+    if was_search_run_today(last_datetime):
+        logging.info(f"Search already run today ({last_datetime.date()}), skipping...")
+        return False
+    
+    # Check if it's time to run the search
+    if not is_search_time_reached(search_time_utc):
+        logging.info(f"Current time is before search time {search_time_utc} UTC, skipping...")
+        return False
+    
+    logging.info(f"Search conditions met - current time is after {search_time_utc} UTC")
+    return True
 
 
 def should_run_delivery(last_datetime: Optional[datetime], delivery_time_utc: str) -> bool:
