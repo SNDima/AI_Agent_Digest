@@ -17,11 +17,11 @@
 - ✅ **LLM-Based Relevance Scoring** (1-100 scale) for intelligent content filtering
 - ✅ **Smart Article Filtering** with configurable selection criteria (top 3-5 articles)
 - ✅ **AI Post Creation** with engaging social media posts and clickable article links
+- ✅ **Telegram Integration** with automated digest delivery and message ID tracking
 - ✅ **Structured Output Processing** using Pydantic models for reliable data handling
 - ✅ **SQLite Database** with migration system for persistent storage
 - ✅ **Batch Operations** for improved performance and reliability
 - ✅ **Modular Configuration** with separate YAML files for each component
-- ✅ **Telegram Integration** for automated digest delivery
 - ✅ **Comprehensive Testing** with unit tests for all major components
 - ⬜ **arXiv API Integration** for research paper collection
 - ⬜ **Hugging Face Blog** support (RSS + scraping)
@@ -29,16 +29,15 @@
 - ⬜ **Multi-language Support** for international content  
 
 ## 🛠️ Tech Stack  
-- **Language**: Python 3.11+  
+- **Language**: Python 3.13+  
 - **Workflow**: LangGraph for intelligent orchestration
 - **AI Framework**: LangChain for tools and utilities
 - **Content Sources**: RSS feeds, Web search APIs
 - **Web Search**: SerpAPI via LangChain for real-time search results
 - **AI Processing**: OpenAI GPT-4 models for summarization and scoring
-- **Structured Output**: Pydantic models with `with_structured_output` for reliable data handling
 - **Data Models**: Pydantic for type safety and validation
 - **Storage**: SQLite with migration system (`db/migrations/`)  
-- **Delivery**: Telegram Bot API  
+- **Delivery**: Telegram Bot API with python-telegram-bot library
 - **Configuration**: YAML-based modular configuration system
 
 ## 📂 Project Structure  
@@ -98,18 +97,8 @@ The AI Agent Digest follows a sophisticated 8-step workflow:
 4. **📊 Relevance Scoring**: Uses LLM to score each article (1-100) for AI agent relevance
 5. **💾 Database Update**: Saves relevance scores to the database for persistence
 6. **🎯 Smart Filtering**: Selects top 3-5 articles based on relevance scores
-7. **✍️ AI Post Creation**: Creates engaging social media posts with article links using LLM
-8. **📱 Telegram Delivery**: Publishes curated digest to Telegram channel
-
-### 🧠 AI-Powered Scoring System
-
-The relevance scoring system uses advanced LLM capabilities:
-
-- **Intelligent Criteria**: Scores based on AI agent relevance, technical depth, and recency
-- **Smart Filtering**: 
-  - If ≥5 articles score >80: Selects top 5
-  - If <5 articles score >80: Selects top 3
-- **Reasoning Capture**: Captures LLM reasoning for each score
+7. **✍️ AI Post Creation**: Creates engaging HTML-formatted social media posts with article links using LLM
+8. **📱 Telegram Delivery**: Publishes curated digest to Telegram channel with message ID tracking
 
 
 ## ⚡ Getting Started  
@@ -128,7 +117,7 @@ The relevance scoring system uses advanced LLM capabilities:
    **Note**: The `requirements.txt` uses compatible version pinning (`~=`) for stability while allowing patch updates.  
 3. Set up environment variables:
    ```bash
-   # Rename the example file and add your API keys
+   # Rename the example file
    mv .env.example .env
    # Then edit .env with your actual API keys
    ```
@@ -143,7 +132,6 @@ The relevance scoring system uses advanced LLM capabilities:
 
 ## 🗄 Database Migration Workflow  
 - All schema changes are tracked as **SQL migration scripts** in `db/migrations/`.  
-- Each migration file must follow the naming pattern: `NNN_description.sql` (e.g., `002_add_processed_flag.sql`).  
 - Use the migration runner to apply all pending migrations:  
   ```bash
   python -m db.migrate
@@ -159,7 +147,10 @@ Rename `.env.example` to `.env` and add your API keys:
 # Rename the example file
 mv .env.example .env
 
-# Then edit .env with your actual values
+# Then edit .env with your actual values:
+# - OpenAI API key for AI processing
+# - SerpAPI key for web search
+# - Telegram bot token and channel for delivery
 ```
 
 ### Database Configuration (`config/database.yaml`)
@@ -221,6 +212,33 @@ post_creator:
   max_articles_in_post: 5
   include_article_links: true
 ```
+
+### Delivery Configuration (`config/delivery.yaml`)
+```yaml
+delivery:
+  delivery_time_utc: "18:00"
+  articles_freshness: last_24h
+```
+
+**Configuration Options:**
+- `delivery_time_utc`: UTC time for daily digest delivery (24-hour format)
+- `articles_freshness`: Time window for article selection (e.g., `last_24h`, `last_48h`)
+
+### Telegram Configuration (`.env`)
+```bash
+# Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_CHANNEL=your_channel_id_or_username
+TELEGRAM_PARSE_MODE=HTML
+```
+
+**Telegram Setup:**
+1. Create a Telegram bot via [@BotFather](https://t.me/botfather)
+2. Get your bot token and add it to `TELEGRAM_BOT_TOKEN`
+3. Add your channel ID (or @username) to `TELEGRAM_CHANNEL`
+4. Set `TELEGRAM_PARSE_MODE=HTML` for rich text formatting
+5. Make sure your bot is added as an administrator to your channel
+
 
 ### Configuration Features
 - **Modular Configuration**: Separate YAML files for each component

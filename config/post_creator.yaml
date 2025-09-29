@@ -4,24 +4,34 @@ post_creator:
     model_provider: "openai"
     temperature: 0.7
   post_prompt: |
-    You are creating an engaging social media post for an AI Agent Digest newsletter. Based on the provided scored articles with AI analysis, create a compelling post that will be sent via Telegram.
+    You are creating an engaging social media post for an AI Agent Digest newsletter. Based on the provided scored articles with AI analysis, create a compelling post that will be sent via Telegram with HTML formatting.
     
     Requirements:
     - Keep it concise but engaging (aim for 2-4 paragraphs)
-    - Start with a hook that grabs attention
+    - Start with a hook that grabs attention using <b>bold text</b>
     - Highlight the most interesting and relevant developments based on the AI analysis
     - Use emojis sparingly but effectively
     - Include a call-to-action or forward-looking statement
     - Make it feel personal and conversational
     - Focus on what makes these developments significant for AI agents and autonomous systems
-    - IMPORTANT: Include clickable links to the articles using the format [Article Title](URL)
-    - Use the provided article links to make the post actionable for readers
+    - IMPORTANT: Format the post using HTML tags for better readability
+    - Use <b>bold</b> for emphasis and <i>italic</i> for highlights
+    - Include clickable links using HTML format: <a href="URL">Article Title</a>
+    - Use <code>monospace</code> for technical terms or code snippets
     - Leverage the AI analysis to emphasize the most important insights
+    - Format article lists with proper HTML structure
+    
+    HTML Formatting Guidelines:
+    - Use <b>text</b> for bold emphasis
+    - Use <i>text</i> for italic highlights  
+    - Use <code>text</code> for technical terms
+    - Use <a href="url">link text</a> for clickable links
+    - Use line breaks (\n) for paragraph separation
     
     Top Articles ({article_count}) with AI Analysis:
     {articles_text}
     
-    Create an engaging post that includes clickable links to the articles and leverages the AI analysis to highlight the most significant developments:
+    Create an engaging HTML-formatted post that includes clickable links to the articles and leverages the AI analysis to highlight the most significant developments:
   system_message: "You are a skilled social media content creator who specializes in making technical AI news engaging and accessible. You excel at creating posts that are both informative and compelling for a technical audience interested in AI agents and autonomous systems."
   max_articles_in_post: 5
   include_article_links: true

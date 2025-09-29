@@ -71,7 +71,7 @@ class TestPostCreator:
             with patch('processing.post_creator.init_chat_model') as mock_init_chat:
                 mock_chat_model = MagicMock()
                 mock_response = MagicMock()
-                mock_response.content = "🤖 AI Agent Digest: Exciting developments in AI agents!"
+                mock_response.content = "<b>🤖 AI Agent Digest:</b> Exciting developments in AI agents!"
                 mock_chat_model.invoke.return_value = mock_response
                 mock_init_chat.return_value = mock_chat_model
                 
@@ -85,7 +85,7 @@ class TestPostCreator:
                 
                 result = creator.create_post(articles)
                 
-                assert "🤖 AI Agent Digest" in result
+                assert "<b>🤖 AI Agent Digest:</b>" in result
                 mock_chat_model.invoke.assert_called_once()
     
     def test_create_post_fallback(self):
@@ -119,9 +119,52 @@ class TestPostCreator:
                 
                 result = creator.create_post(articles)
                 
-                assert "🤖 AI Agent Digest Update" in result
+                assert "<b>🤖 AI Agent Digest Update</b>" in result
                 assert "2 new articles" in result
-                assert "1. Test Article 1" in result
-                assert "2. Test Article 2" in result
-                assert "https://example.com/1" in result
-                assert "https://example.com/2" in result
+                assert "1. <a href=\"https://example.com/1\">Test Article 1</a>" in result
+                assert "2. <a href=\"https://example.com/2\">Test Article 2</a>" in result
+                assert "<code>Test Source 1</code>" in result
+                assert "<code>Test Source 2</code>" in result
+                assert "<b>Stay tuned for more AI agent developments!</b>" in result
+    
+    def test_fallback_post_html_formatting(self):
+        """Test that fallback post generates proper HTML formatting."""
+        with patch('processing.post_creator.load_config') as mock_load_config:
+            mock_config = {
+                "post_creator": {
+                    "chat_model": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
+                    "max_articles_in_post": 5,
+                    "post_prompt": "Test prompt",
+                    "system_message": "Test system message"
+                }
+            }
+            mock_load_config.return_value = mock_config
+            
+            with patch('processing.post_creator.init_chat_model') as mock_init_chat:
+                mock_chat_model = MagicMock()
+                mock_chat_model.invoke.side_effect = Exception("LLM failed")
+                mock_init_chat.return_value = mock_chat_model
+                
+                creator = PostCreator("test_config.yaml")
+                
+                articles = [
+                    ScoredArticle(
+                        guid="test-guid-1", 
+                        title="AI Agent Framework Released", 
+                        summary="New framework for building AI agents", 
+                        source="TechCrunch", 
+                        link="https://techcrunch.com/ai-agent-framework", 
+                        published_at=datetime.now(),
+                        reasoning="This is a groundbreaking development in AI agent technology that will enable developers to build more sophisticated autonomous systems"
+                    )
+                ]
+                
+                result = creator._create_fallback_post(articles)
+                
+                # Check HTML formatting elements
+                assert "<b>🤖 AI Agent Digest Update</b>" in result
+                assert "<i>1 new articles about AI agents and autonomous systems:</i>" in result
+                assert "<a href=\"https://techcrunch.com/ai-agent-framework\">AI Agent Framework Released</a>" in result
+                assert "<code>TechCrunch</code>" in result
+                assert "<i>This is a groundbreaking development in AI agent technology that will enable developers to build mor...</i>" in result
+                assert "<b>Stay tuned for more AI agent developments!</b> 🚀" in result

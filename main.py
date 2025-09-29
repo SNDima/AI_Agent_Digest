@@ -154,10 +154,10 @@ def deliver_digest_node(state: DigestState) -> DigestState:
         
         # Step 7: Deliver digest via Telegram
         logging.info("Delivering digest...")
-        telegram.send(post_text)
+        message_id = telegram.send(post_text)
         
         # Step 8: Save delivery record
-        delivery = Delivery(content=post_text)
+        delivery = Delivery(content=post_text, origin_message_id=str(message_id))
         save_delivery(delivery, DATABASE_CONFIG_PATH)
         
         return state
