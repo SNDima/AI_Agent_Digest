@@ -20,3 +20,10 @@ class Article(BaseModel):
     published_at: Optional[datetime] = Field(None, description="Publication date and time")
     fetched_at: Optional[datetime] = Field(None, description="Date and time when article was fetched")
     posted: bool = Field(False, description="Whether the article has been posted to delivery channel")
+    relevance_score: Optional[int] = Field(None, description="Relevance score from 1-100 for AI agent content")
+
+
+class ScoredArticle(Article):
+    """Article model with LLM reasoning for relevance scoring."""
+    
+    reasoning: Optional[str] = Field(None, description="LLM reasoning for the relevance score")

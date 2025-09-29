@@ -3,8 +3,6 @@ search_agent:
   freshness: last_24h
   results_per_query: 5
   max_results_for_summary: 25
-  schedule: daily
-  search_time_utc: "18:00"
   chat_model:
     model: "gpt-4.1"
     model_provider: "openai"

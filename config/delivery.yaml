@@ -1,0 +1,3 @@
+delivery:
+  delivery_time_utc: "18:00"
+  articles_freshness: last_24h

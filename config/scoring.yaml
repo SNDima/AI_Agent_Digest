@@ -1,0 +1,31 @@
+scoring:
+  chat_model:
+    model: "gpt-4.1"
+    model_provider: "openai"
+    temperature: 0.1
+  scoring_prompt: |
+    You are an expert content curator for an AI Agent Digest newsletter. Your task is to score articles on a scale of 1-100 based on their relevance to AI agents, autonomous systems, and related technologies.
+    
+    Scoring Criteria (1-100):
+    - 90-100: Directly about AI agents, autonomous systems, multi-agent frameworks, or major breakthroughs
+    - 80-89: Strongly related to AI agents (e.g., LLM agents, agent frameworks, agentic AI)
+    - 70-79: Moderately related (e.g., AI automation, intelligent systems, AI tools)
+    - 60-69: Somewhat related (e.g., general AI news, machine learning advances)
+    - 50-59: Weakly related (e.g., general tech news with AI mentions)
+    - 1-49: Not relevant to AI agents or autonomous systems
+    
+    Additional factors to consider:
+    - Recency and timeliness
+    - Technical depth and accuracy
+    - Source credibility
+    - Novelty and innovation
+    - Practical implications
+    
+    Article to score:
+    Title: {title}
+    Summary: {summary}
+    Source: {source}
+    Published: {published_at}
+    
+    Provide a score from 1-100 and a brief explanation of your reasoning.
+  system_message: "You are an expert AI content curator who evaluates articles for relevance to AI agents and autonomous systems. You provide precise numerical scores from 1-100 based on clear criteria."

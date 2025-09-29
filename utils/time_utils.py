@@ -3,7 +3,7 @@ Time utility functions for checking search conditions.
 """
 
 import logging
-from datetime import datetime, time, timezone
+from datetime import datetime, time, timezone, timedelta
 from typing import Optional
 
 
@@ -31,9 +31,6 @@ def was_search_run_today(last_datetime: Optional[datetime]) -> bool:
     
     today = datetime.now(timezone.utc).date()
     return last_datetime.date() == today
-
-
-def should_run_search(last_datetime: Optional[datetime], search_time_utc: str) -> bool:
     """Check if search should run based on date and time conditions."""
     # Check if search was already run today
     if was_search_run_today(last_datetime):
@@ -47,3 +44,36 @@ def should_run_search(last_datetime: Optional[datetime], search_time_utc: str) -
     
     logging.info(f"Search conditions met - current time is after {search_time_utc} UTC")
     return True
+
+
+def should_run_delivery(last_datetime: Optional[datetime], delivery_time_utc: str) -> bool:
+    """Check if delivery should run based on date and time conditions."""
+    # Check if delivery was already run today
+    if was_search_run_today(last_datetime):
+        logging.info(f"Delivery already run today ({last_datetime.date()}), skipping...")
+        return False
+    
+    # Check if it's time to run the delivery
+    if not is_search_time_reached(delivery_time_utc):
+        logging.info(f"Current time is before delivery time {delivery_time_utc} UTC, skipping...")
+        return False
+    
+    logging.info(f"Delivery conditions met - current time is after {delivery_time_utc} UTC")
+    return True
+
+
+def parse_articles_freshness(freshness: str) -> datetime:
+    """Parse articles_freshness string to get cutoff datetime."""
+    now = datetime.now()
+    
+    if freshness == "last_1h":
+        return now - timedelta(hours=1)
+    elif freshness == "last_24h":
+        return now - timedelta(hours=24)
+    elif freshness == "last_7d":
+        return now - timedelta(days=7)
+    elif freshness == "last_30d":
+        return now - timedelta(days=30)
+    else:
+        # Default to 24 hours if unknown format
+        return now - timedelta(hours=24)
