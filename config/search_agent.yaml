@@ -5,6 +5,10 @@ search_agent:
   max_results_for_summary: 25
   schedule: daily
   search_time_utc: "18:00"
+  chat_model:
+    model: "gpt-4.1"
+    model_provider: "openai"
+    temperature: 0.3
   summary_prompt: |
     Please provide an engaging summary of the following search results for the query "{query}".
     Focus on the most trending, interesting, and newsworthy information that would be compelling to read.
@@ -25,6 +29,6 @@ search_agent:
   queries:
   - AI Agents
   - LangChain agents
-  # - autonomous AI agents
-  # - multi-agent systems
-  # - CrewAI OR AutoGen agents
+  - autonomous AI agents
+  - multi-agent systems
+  - CrewAI OR AutoGen agents

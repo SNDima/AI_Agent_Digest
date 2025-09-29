@@ -30,10 +30,11 @@ class SearchAgent:
             raise ValueError("OPENAI_API_KEY environment variable is required")
             
         # Initialize LangChain chat model
+        chat_model_config = self.config["search_agent"]["chat_model"]
         self.chat_model = init_chat_model(
-            model="gpt-4.1",
-            model_provider="openai",
-            temperature=0.3
+            model=chat_model_config["model"],
+            model_provider=chat_model_config["model_provider"],
+            temperature=chat_model_config["temperature"]
         )
         
         # Initialize SerpAPI wrapper through LangChain
