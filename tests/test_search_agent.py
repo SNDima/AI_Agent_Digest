@@ -31,7 +31,7 @@ class TestSearchAgent:
     @patch('search.agent.load_config')
     @patch('search.agent.init_chat_model')
     @patch('search.agent.SerpAPIWrapper')
-    def test_search_success(self, mock_serpapi_wrapper, mock_load_config, mock_config):
+    def test_search_success(self, mock_serpapi_wrapper, mock_chat_model, mock_load_config, mock_config):
         """Test successful search with valid results."""
         # Setup mocks
         mock_load_config.return_value = mock_config
@@ -66,7 +66,7 @@ class TestSearchAgent:
     @patch('search.agent.load_config')
     @patch('search.agent.init_chat_model')
     @patch('search.agent.SerpAPIWrapper')
-    def test_search_empty_results(self, mock_serpapi_wrapper, mock_load_config, mock_config):
+    def test_search_empty_results(self, mock_serpapi_wrapper, mock_chat_model, mock_load_config, mock_config):
         """Test search with empty results."""
         # Setup mocks
         mock_load_config.return_value = mock_config
@@ -87,7 +87,7 @@ class TestSearchAgent:
     @patch('search.agent.load_config')
     @patch('search.agent.init_chat_model')
     @patch('search.agent.SerpAPIWrapper')
-    def test_search_serpapi_exception(self, mock_serpapi_wrapper, mock_load_config, mock_config):
+    def test_search_serpapi_exception(self, mock_serpapi_wrapper, mock_chat_model, mock_load_config, mock_config):
         """Test search when SerpAPI raises an exception."""
         # Setup mocks
         mock_load_config.return_value = mock_config
@@ -208,3 +208,46 @@ class TestSearchAgent:
         
         # Verify combined query
         assert combined_query == "AI Agents | LangChain agents"
+
+    @patch.dict('os.environ', {'SERPAPI_KEY': 'test_key', 'OPENAI_API_KEY': 'test_openai_key'})
+    @patch('search.agent.load_config')
+    @patch('search.agent.init_chat_model')
+    @patch('search.agent.SerpAPIWrapper')
+    def test_search_google_news_engine(self, mock_serpapi_wrapper, mock_chat_model, mock_load_config, mock_config):
+        """Test search with Google News engine using news_results format."""
+        # Setup mocks with Google News engine config
+        google_news_config = mock_config.copy()
+        google_news_config["search_agent"]["engine"] = "google_news"
+        mock_load_config.return_value = google_news_config
+        mock_serpapi_instance = MagicMock()
+        mock_serpapi_instance.results.return_value = {
+            "news_results": [
+                {
+                    "title": "Breaking: AI Agents Transform News Industry",
+                    "snippet": "Latest developments in AI agent technology...",
+                    "source": "reuters.com",
+                    "date": "2024-01-15"
+                }
+            ]
+        }
+        mock_serpapi_wrapper.return_value = mock_serpapi_instance
+        
+        # Create SearchAgent instance
+        agent = SearchAgent("dummy_config.yaml")
+        
+        # Perform search
+        results = agent.search("AI agents")
+        
+        # Verify results
+        assert len(results) == 1
+        assert isinstance(results[0], SearchResult)
+        assert results[0].title == "Breaking: AI Agents Transform News Industry"
+        assert results[0].snippet == "Latest developments in AI agent technology..."
+        assert results[0].source == "reuters.com"
+        assert isinstance(results[0].published_date, datetime)
+        
+        # Verify SerpAPIWrapper was called with engine parameter
+        mock_serpapi_wrapper.assert_called_once()
+        call_args = mock_serpapi_wrapper.call_args
+        assert call_args[1]["params"]["engine"] == "google_news"
+        assert call_args[1]["params"]["num"] == 5

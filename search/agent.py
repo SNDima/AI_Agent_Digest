@@ -38,9 +38,16 @@ class SearchAgent:
         )
         
         # Initialize SerpAPI wrapper through LangChain
+        search_config = self.config["search_agent"]
+        params = {"num": search_config["results_per_query"]}
+        
+        # Add engine parameter if specified in config
+        if "engine" in search_config:
+            params["engine"] = search_config["engine"]
+            
         self.serpapi_wrapper = SerpAPIWrapper(
             serpapi_api_key=self.serpapi_key,
-            params={"num": self.config["search_agent"]["results_per_query"]}
+            params=params
         )
     
     def _build_search_query(self, query: str) -> str:
@@ -81,10 +88,17 @@ class SearchAgent:
             
             search_results = []
             
-            # Extract organic results from SerpAPI response
-            organic_results = results.get("organic_results", [])
+            # Determine which results to extract based on engine
+            engine = self.config["search_agent"].get("engine", "google")
             
-            for result in organic_results:
+            if engine == "google_news":
+                # Google News returns results under "news_results"
+                raw_results = results.get("news_results", [])
+            else:
+                # Default Google search returns results under "organic_results"
+                raw_results = results.get("organic_results", [])
+            
+            for result in raw_results:
                 search_results.append(SearchResult(
                     title=result.get("title", ""),
                     snippet=result.get("snippet", ""),
