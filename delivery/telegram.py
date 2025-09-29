@@ -7,9 +7,9 @@ from models.article import Article
 # Load environment variables from .env file
 load_dotenv()
 
-def send(items: List[Article]) -> None:
+def send(post_text: str) -> None:
     """
-    Placeholder for sending digest to Telegram.
+    Send digest post to Telegram.
     Currently just prints info.
     """
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -18,4 +18,5 @@ def send(items: List[Article]) -> None:
     if not bot_token or not chat_id:
         raise ValueError("Telegram credentials (TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID) must be set in environment variables")
 
-    logging.info(f"Would send {len(items)} items to Telegram channel {chat_id}")
+    logging.info(f"Would send post to Telegram channel {chat_id}")
+    logging.info(f"Post content:\n{post_text}")

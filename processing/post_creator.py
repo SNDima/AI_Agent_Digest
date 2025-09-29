@@ -1,0 +1,102 @@
+"""
+Post creator module for generating engaging social media posts from articles.
+"""
+
+import logging
+from typing import List
+from langchain.chat_models import init_chat_model
+from utils.config import load_config
+from models.article import ScoredArticle
+
+
+class PostCreator:
+    """Creates engaging social media posts from articles using LLM."""
+    
+    def __init__(self, config_path: str):
+        """Initialize the post creator with configuration."""
+        self.config = load_config(config_path)
+        
+        # Initialize LangChain chat model
+        chat_model_config = self.config["post_creator"]["chat_model"]
+        self.chat_model = init_chat_model(
+            model=chat_model_config["model"],
+            model_provider=chat_model_config["model_provider"],
+            temperature=chat_model_config["temperature"]
+        )
+    
+    def _format_articles_for_post(self, articles: List[ScoredArticle]) -> str:
+        """Format articles for inclusion in the post prompt."""
+        max_articles = self.config["post_creator"]["max_articles_in_post"]
+        articles_to_include = articles[:max_articles]
+        
+        formatted_articles = []
+        for i, article in enumerate(articles_to_include, 1):
+            article_text = f"{i}. {article.title}"
+            if article.summary:
+                article_text += f"\n   {article.summary[:200]}{'...' if len(article.summary) > 200 else ''}"
+            if article.source:
+                article_text += f"\n   Source: {article.source}"
+            if article.published_at:
+                article_text += f"\n   Published: {article.published_at.strftime('%Y-%m-%d %H:%M')}"
+            if article.link:
+                article_text += f"\n   Link: {article.link}"
+            if article.reasoning:
+                article_text += f"\n   AI Analysis: {article.reasoning}"
+            
+            formatted_articles.append(article_text)
+        
+        return "\n\n".join(formatted_articles)
+    
+    def create_post(self, articles: List[ScoredArticle]) -> str:
+        """Create an engaging social media post from articles."""
+        logging.info("Creating social media post...")
+        
+        try:
+            # Format articles for the prompt
+            articles_text = self._format_articles_for_post(articles)
+            article_count = len(articles)
+            
+            # Prepare the prompt
+            prompt = self.config["post_creator"]["post_prompt"].format(
+                articles_text=articles_text,
+                article_count=article_count
+            )
+            
+            # Generate the post using the chat model
+            messages = [
+                {"role": "system", "content": self.config["post_creator"]["system_message"]},
+                {"role": "user", "content": prompt}
+            ]
+            
+            response = self.chat_model.invoke(messages)
+            post_text = response.content.strip()
+            
+            logging.info("Successfully created social media post")
+            return post_text
+            
+        except Exception as e:
+            logging.error(f"Failed to create post: {e}")
+            # Fallback to a simple post if LLM fails
+            return self._create_fallback_post(articles)
+    
+    def _create_fallback_post(self, articles: List[ScoredArticle]) -> str:
+        """Create a simple fallback post if LLM generation fails."""
+        logging.warning("Using fallback post generation")
+        
+        post_lines = [
+            "🤖 AI Agent Digest Update",
+            "",
+            f"📰 {len(articles)} new articles about AI agents and autonomous systems:",
+            ""
+        ]
+        
+        # Add top 3 articles with links
+        for i, article in enumerate(articles[:3], 1):
+            post_lines.append(f"{i}. {article.title}")
+            if article.source:
+                post_lines.append(f"   📍 {article.source}")
+            if article.link:
+                post_lines.append(f"   🔗 {article.link}")
+            post_lines.append("")
+        
+        return "\n".join(post_lines)
