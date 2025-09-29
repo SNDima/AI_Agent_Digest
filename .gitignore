@@ -208,3 +208,6 @@ __marimo__/
 
 # Ignore database file
 digest.db
+*.db-journal
+*.db-wal
+*.db-shm

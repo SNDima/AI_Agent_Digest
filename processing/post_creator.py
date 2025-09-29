@@ -2,6 +2,7 @@
 Post creator module for generating engaging social media posts from articles.
 """
 
+import html
 import logging
 from typing import List
 from langchain.chat_models import init_chat_model
@@ -84,19 +85,40 @@ class PostCreator:
         logging.warning("Using fallback post generation")
         
         post_lines = [
-            "🤖 AI Agent Digest Update",
+            "<b>🤖 AI Agent Digest Update</b>",
             "",
-            f"📰 {len(articles)} new articles about AI agents and autonomous systems:",
+            f"📰 <i>{len(articles)} new articles about AI agents and autonomous systems:</i>",
             ""
         ]
         
         # Add top 3 articles with links
         for i, article in enumerate(articles[:3], 1):
-            post_lines.append(f"{i}. {article.title}")
-            if article.source:
-                post_lines.append(f"   📍 {article.source}")
+            # Escape HTML characters in title and link
+            escaped_title = html.escape(article.title)
+            escaped_link = html.escape(str(article.link), quote=True) if article.link else None
+            
             if article.link:
-                post_lines.append(f"   🔗 {article.link}")
+                post_lines.append(f"{i}. <a href=\"{escaped_link}\">{escaped_title}</a>")
+            else:
+                post_lines.append(f"{i}. {escaped_title}")
+            
+            if article.source:
+                # Escape HTML characters in source
+                escaped_source = html.escape(article.source)
+                post_lines.append(f"   📍 <code>{escaped_source}</code>")
+            
+            # Add AI reasoning if available
+            if article.reasoning:
+                reasoning_preview = article.reasoning[:100] + "..." if len(article.reasoning) > 100 else article.reasoning
+                # Escape HTML characters in reasoning
+                escaped_reasoning = html.escape(reasoning_preview)
+                post_lines.append(f"   💡 <i>{escaped_reasoning}</i>")
+            
             post_lines.append("")
+        
+        # Add footer
+        post_lines.extend([
+            "<b>Stay tuned for more AI agent developments!</b> 🚀"
+        ])
         
         return "\n".join(post_lines)
