@@ -24,29 +24,3 @@ def save_search_summary(summary: SearchSummary, config_path: str) -> None:
         conn.commit()
     finally:
         conn.close()
-
-
-def get_latest_search_summary(config_path: str) -> Optional[SearchSummary]:
-    """Get the latest search summary from the database."""
-    db_file = get_database_file(config_path)
-    conn = sqlite3.connect(db_file)
-    conn.row_factory = sqlite3.Row
-    try:
-        cursor = conn.cursor()
-        cursor.execute(
-            """
-            SELECT id, summary_text, fetched_at
-            FROM search_summaries
-            ORDER BY fetched_at DESC
-            LIMIT 1
-            """
-        )
-        row = cursor.fetchone()
-        if row:
-            return SearchSummary(
-                summary_text=row['summary_text'],
-                fetched_at=row['fetched_at']
-            )
-        return None
-    finally:
-        conn.close()
