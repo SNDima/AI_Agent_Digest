@@ -2,6 +2,7 @@
 Post creator module for generating engaging social media posts from articles.
 """
 
+import html
 import logging
 from typing import List
 from langchain.chat_models import init_chat_model
@@ -92,18 +93,26 @@ class PostCreator:
         
         # Add top 3 articles with links
         for i, article in enumerate(articles[:3], 1):
+            # Escape HTML characters in title and link
+            escaped_title = html.escape(article.title)
+            escaped_link = html.escape(str(article.link), quote=True) if article.link else None
+            
             if article.link:
-                post_lines.append(f"{i}. <a href=\"{article.link}\">{article.title}</a>")
+                post_lines.append(f"{i}. <a href=\"{escaped_link}\">{escaped_title}</a>")
             else:
-                post_lines.append(f"{i}. {article.title}")
+                post_lines.append(f"{i}. {escaped_title}")
             
             if article.source:
-                post_lines.append(f"   📍 <code>{article.source}</code>")
+                # Escape HTML characters in source
+                escaped_source = html.escape(article.source)
+                post_lines.append(f"   📍 <code>{escaped_source}</code>")
             
             # Add AI reasoning if available
             if article.reasoning:
                 reasoning_preview = article.reasoning[:100] + "..." if len(article.reasoning) > 100 else article.reasoning
-                post_lines.append(f"   💡 <i>{reasoning_preview}</i>")
+                # Escape HTML characters in reasoning
+                escaped_reasoning = html.escape(reasoning_preview)
+                post_lines.append(f"   💡 <i>{escaped_reasoning}</i>")
             
             post_lines.append("")
         

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 from typing import List
@@ -9,9 +10,9 @@ from telegram.error import TelegramError
 # Load environment variables from .env file
 load_dotenv()
 
-def send(post_text: str) -> int:
+async def send_async(post_text: str) -> int:
     """
-    Send digest post to Telegram.
+    Send digest post to Telegram (async version).
     
     Returns:
         int: The message ID of the sent message
@@ -29,7 +30,7 @@ def send(post_text: str) -> int:
         
         # Send message to Telegram
         logging.info(f"Sending post to Telegram channel {chat_id}")
-        message = bot.send_message(
+        message = await bot.send_message(
             chat_id=chat_id,
             text=post_text,
             parse_mode=parse_mode
@@ -44,3 +45,12 @@ def send(post_text: str) -> int:
     except Exception as e:
         logging.error(f"Unexpected error while sending to Telegram: {e}")
         raise
+
+def send(post_text: str) -> int:
+    """
+    Send digest post to Telegram (synchronous wrapper for async function).
+    
+    Returns:
+        int: The message ID of the sent message
+    """
+    return asyncio.run(send_async(post_text))

@@ -1,6 +1,6 @@
 """Tests for the telegram delivery module."""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 import pytest
 from telegram.error import TelegramError
 from delivery.telegram import send
@@ -21,7 +21,8 @@ class TestTelegramSend:
                 mock_bot_class.return_value = mock_bot
                 mock_message = MagicMock()
                 mock_message.message_id = 12345
-                mock_bot.send_message.return_value = mock_message
+                # Mock the async send_message method
+                mock_bot.send_message = AsyncMock(return_value=mock_message)
                 
                 result = send("<b>Test Post</b>")
                 
@@ -49,7 +50,8 @@ class TestTelegramSend:
             with patch('delivery.telegram.Bot') as mock_bot_class:
                 mock_bot = MagicMock()
                 mock_bot_class.return_value = mock_bot
-                mock_bot.send_message.side_effect = TelegramError("Bot was blocked")
+                # Mock the async send_message method to raise TelegramError
+                mock_bot.send_message = AsyncMock(side_effect=TelegramError("Bot was blocked"))
                 
                 with pytest.raises(TelegramError, match="Bot was blocked"):
                     send("Test message")
