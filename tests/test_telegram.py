@@ -31,7 +31,8 @@ class TestTelegramSend:
                 mock_bot.send_message.assert_called_once_with(
                     chat_id='test_channel_id',
                     text="<b>Test Post</b>",
-                    parse_mode='HTML'
+                    parse_mode='HTML',
+                    disable_web_page_preview=True
                 )
 
     def test_send_missing_credentials(self):

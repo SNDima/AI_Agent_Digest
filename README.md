@@ -210,7 +210,6 @@ post_creator:
     You are creating an engaging social media post for an AI Agent Digest newsletter...
   system_message: "You are a skilled social media content creator..."
   max_articles_in_post: 5
-  include_article_links: true
 ```
 
 ### Delivery Configuration (`config/delivery.yaml`)

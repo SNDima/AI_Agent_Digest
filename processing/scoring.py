@@ -81,8 +81,32 @@ class RelevanceScorer:
         logging.info(f"Scoring {len(articles)} articles for relevance...")
         
         scored_articles = []
+        skipped_count = 0
         
         for article in articles:
+            # Skip articles that already have a relevance score
+            if article.relevance_score is not None:
+                logging.debug(f"Skipping article '{article.title}' - already scored with score: {article.relevance_score}")
+                skipped_count += 1
+                
+                # Convert existing Article to ScoredArticle preserving existing score
+                scored_article = ScoredArticle(
+                    guid=article.guid,
+                    source=article.source,
+                    title=article.title,
+                    link=article.link,
+                    summary=article.summary,
+                    author=article.author,
+                    categories=article.categories,
+                    published_at=article.published_at,
+                    fetched_at=article.fetched_at,
+                    posted=article.posted,
+                    relevance_score=article.relevance_score,
+                    reasoning=getattr(article, 'reasoning', None)  # Preserve existing reasoning if available
+                )
+                scored_articles.append(scored_article)
+                continue
+            
             score, reasoning = self._score_article(article)
             
             # Create a ScoredArticle with the relevance score and reasoning
@@ -108,7 +132,7 @@ class RelevanceScorer:
             avg_score = sum(valid_scores) / len(valid_scores)
             high_relevance = len([s for s in valid_scores if s >= 70])
             high_relevance_percentage = high_relevance / len(valid_scores) * 100
-            logging.info(f"Scoring complete. Average score: {avg_score:.1f}, High relevance (70+): {high_relevance_percentage:.1f}%")
+            logging.info(f"Scoring complete. Processed: {len(articles)}, Skipped: {skipped_count}, New scores: {len(valid_scores) - skipped_count}. Average score: {avg_score:.1f}, High relevance (70+): {high_relevance_percentage:.1f}%")
         else:
             logging.warning("No valid scores generated")
             

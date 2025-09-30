@@ -33,7 +33,8 @@ async def send_async(post_text: str) -> int:
         message = await bot.send_message(
             chat_id=chat_id,
             text=post_text,
-            parse_mode=parse_mode
+            parse_mode=parse_mode,
+            disable_web_page_preview=True
         )
         
         logging.info(f"Successfully sent message to Telegram. Message ID: {message.message_id}")
@@ -41,9 +42,11 @@ async def send_async(post_text: str) -> int:
         
     except TelegramError as e:
         logging.error(f"Failed to send message to Telegram: {e}")
+        logging.error(f"Post text that failed to send: {post_text}")
         raise
     except Exception as e:
         logging.error(f"Unexpected error while sending to Telegram: {e}")
+        logging.error(f"Post text that failed to send: {post_text}")
         raise
 
 def send(post_text: str) -> int:
