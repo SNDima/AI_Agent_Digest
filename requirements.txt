@@ -11,3 +11,5 @@ langgraph~=0.6              # For workflow orchestration
 langchain-core~=0.3         # For LangChain core functionality
 langchain~=0.3              # For LangChain tools
 langchain-community~=0.3    # For community tools including SerpAPI
+langchain-openai~=0.3       # For OpenAI integration with LangChain
+google-search-results~=2.4  # For SerpAPI integration

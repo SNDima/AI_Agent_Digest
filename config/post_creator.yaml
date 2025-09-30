@@ -27,6 +27,9 @@ post_creator:
     - Use <code>text</code> for technical terms
     - Use <a href="url">link text</a> for clickable links
     - Use line breaks (\n) for paragraph separation
+    - IMPORTANT: Do NOT use <br>, <ul>, <li>, <ol>, <p>, <div> tags - use \n for line breaks instead
+    - For lists, use bullet points (•) or numbered lists (1., 2., 3.) with newlines
+    - Only use supported Telegram HTML tags: <b>, <i>, <u>, <s>, <code>, <pre>, <a>
     
     Top Articles ({article_count}) with AI Analysis:
     {articles_text}

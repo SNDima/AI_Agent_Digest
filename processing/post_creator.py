@@ -72,6 +72,9 @@ class PostCreator:
             response = self.chat_model.invoke(messages)
             post_text = response.content.strip()
             
+            # Clean the HTML to be compatible with Telegram
+            post_text = self._clean_telegram_html(post_text)
+            
             logging.info("Successfully created social media post")
             return post_text
             
@@ -122,3 +125,30 @@ class PostCreator:
         ])
         
         return "\n".join(post_lines)
+    
+    def _clean_telegram_html(self, text: str) -> str:
+        """Clean HTML text to be compatible with Telegram's HTML parser."""
+        import re
+        
+        # Replace <br> and <br/> tags with newlines
+        text = text.replace("<br>", "\n").replace("<br/>", "\n").replace("<br />", "\n")
+        
+        # Convert HTML lists to plain text format
+        # Replace <ul> and </ul> with empty string
+        text = text.replace("<ul>", "").replace("</ul>", "")
+        
+        # Replace <li> and </li> with bullet points
+        text = text.replace("<li>", "• ").replace("</li>", "\n")
+        
+        # Remove any other unsupported HTML tags that might cause issues
+        # Telegram supports: <b>, <i>, <u>, <s>, <code>, <pre>, <a>, <tg-spoiler>
+        # Remove other common unsupported tags
+        unsupported_tags = ['<ol>', '</ol>', '<p>', '</p>', '<div>', '</div>', '<span>', '</span>', '<strong>', '</strong>', '<em>', '</em>']
+        for tag in unsupported_tags:
+            text = text.replace(tag, "")
+        
+        # Clean up extra whitespace and newlines
+        text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)  # Replace multiple newlines with double newlines
+        text = text.strip()
+        
+        return text

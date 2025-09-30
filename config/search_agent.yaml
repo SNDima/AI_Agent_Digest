@@ -1,5 +1,5 @@
 search_agent:
-  engine: google_news
+  engine: google
   freshness: last_24h
   results_per_query: 5
   max_results_for_summary: 25

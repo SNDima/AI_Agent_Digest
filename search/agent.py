@@ -88,17 +88,9 @@ class SearchAgent:
             
             search_results = []
             
-            # Determine which results to extract based on engine
-            engine = self.config["search_agent"].get("engine", "google")
+            raw_results = results.get("organic_results", [])
             
-            if engine == "google_news":
-                # Google News returns results under "news_results"
-                raw_results = results.get("news_results", [])
-            else:
-                # Default Google search returns results under "organic_results"
-                raw_results = results.get("organic_results", [])
-            
-            for result in raw_results:
+            for result in raw_results:                
                 search_results.append(SearchResult(
                     title=result.get("title", ""),
                     snippet=result.get("snippet", ""),
