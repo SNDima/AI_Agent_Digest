@@ -72,7 +72,6 @@ class PostCreator:
             response = self.chat_model.invoke(messages)
             post_text = response.content.strip()
             
-            logging.info(f"The post text is: {post_text}")
             logging.info("Successfully created social media post")
             return post_text
             

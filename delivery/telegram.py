@@ -42,9 +42,11 @@ async def send_async(post_text: str) -> int:
         
     except TelegramError as e:
         logging.error(f"Failed to send message to Telegram: {e}")
+        logging.error(f"Post text that failed to send: {post_text}")
         raise
     except Exception as e:
         logging.error(f"Unexpected error while sending to Telegram: {e}")
+        logging.error(f"Post text that failed to send: {post_text}")
         raise
 
 def send(post_text: str) -> int:
