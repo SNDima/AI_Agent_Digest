@@ -204,17 +204,17 @@ class TestPostCreator:
                 
                 result = creator._create_fallback_post(articles)
                 
-                # Check that special characters are handled naturally in HTML
-                assert "AI & ML: The Future of Technology!" in result
-                assert "TechCrunch & Wired" in result
-                assert "https://example.com/test?param=value&other=tag" in result
-                assert "*bold* AI developments & future technologies" in result
+                # Check that special characters are properly escaped in HTML
+                assert "AI &amp; ML: The Future of Technology!" in result
+                assert "TechCrunch &amp; Wired" in result
+                assert "https://example.com/test?param=value&amp;other=tag" in result
+                assert "*bold* AI developments &amp; future technologies" in result
                 
                 # Ensure proper HTML formatting
                 assert "<b>🤖 AI Agent Digest Update</b>" in result
                 assert "<i>1 new articles about AI agents and autonomous systems:</i>" in result
-                assert '<a href="https://example.com/test?param=value&other=tag">AI & ML: The Future of Technology!</a>' in result
-                assert "<code>TechCrunch & Wired</code>" in result
-                assert "<i>This article discusses *bold* AI developments & future technologies</i>" in result
+                assert '<a href="https://example.com/test?param=value&amp;other=tag">AI &amp; ML: The Future of Technology!</a>' in result
+                assert "<code>TechCrunch &amp; Wired</code>" in result
+                assert "<i>This article discusses *bold* AI developments &amp; future technologies</i>" in result
                 assert "<b>Stay tuned for more AI agent developments!</b> 🚀" in result
 
