@@ -52,7 +52,7 @@ class TestPostCreator:
                 assert "Source: Test Source 1" in formatted
                 assert "Published: 2024-01-01 00:00" in formatted
                 assert "Link: https://example.com/1" in formatted
-                assert "AI Analysis: Highly relevant to AI agents due to direct framework discussion" in formatted
+                assert "🎯 WHY THIS MATTERS: Highly relevant to AI agents due to direct framework discussion" in formatted
                 assert "2. Test Article 2" in formatted
     
     def test_create_post_success(self):
@@ -119,16 +119,16 @@ class TestPostCreator:
                 
                 result = creator.create_post(articles)
                 
-                assert "*🤖 AI Agent Digest Update*" in result
+                assert "<b>🤖 AI Agent Digest Update</b>" in result
                 assert "2 new articles" in result
-                assert "1\\. [Test Article 1](https://example.com/1)" in result
-                assert "2\\. [Test Article 2](https://example.com/2)" in result
-                assert "`Test Source 1`" in result
-                assert "`Test Source 2`" in result
-                assert "*Stay tuned for more AI agent developments\\!*" in result
+                assert '1. <a href="https://example.com/1">Test Article 1</a>' in result
+                assert '2. <a href="https://example.com/2">Test Article 2</a>' in result
+                assert "<code>Test Source 1</code>" in result
+                assert "<code>Test Source 2</code>" in result
+                assert "<b>Stay tuned for more AI agent developments!</b>" in result
     
-    def test_fallback_post_markdownv2_formatting(self):
-        """Test that fallback post generates proper MarkdownV2 formatting."""
+    def test_fallback_post_html_formatting(self):
+        """Test that fallback post generates proper HTML formatting."""
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
@@ -161,16 +161,16 @@ class TestPostCreator:
                 
                 result = creator._create_fallback_post(articles)
                 
-                # Check MarkdownV2 formatting elements
-                assert "*🤖 AI Agent Digest Update*" in result
-                assert "_1 new articles about AI agents and autonomous systems:_" in result
-                assert "[AI Agent Framework Released](https://techcrunch.com/ai-agent-framework)" in result
-                assert "`TechCrunch`" in result
-                assert "_This is a groundbreaking development in AI agent technology that will enable developers to build mor\\.\\.\\._" in result
-                assert "*Stay tuned for more AI agent developments\\!* 🚀" in result
+                # Check HTML formatting elements
+                assert "<b>🤖 AI Agent Digest Update</b>" in result
+                assert "<i>1 new articles about AI agents and autonomous systems:</i>" in result
+                assert '<a href="https://techcrunch.com/ai-agent-framework">AI Agent Framework Released</a>' in result
+                assert "<code>TechCrunch</code>" in result
+                assert "<i>This is a groundbreaking development in AI agent technology that will enable developers to build mor...</i>" in result
+                assert "<b>Stay tuned for more AI agent developments!</b> 🚀" in result
 
-    def test_fallback_post_markdownv2_escaping(self):
-        """Test that fallback post properly handles MarkdownV2 special characters."""
+    def test_fallback_post_html_special_characters(self):
+        """Test that fallback post properly handles special characters in HTML."""
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
@@ -189,7 +189,7 @@ class TestPostCreator:
                 
                 creator = PostCreator("test_config.yaml")
                 
-                # Test with MarkdownV2 special characters
+                # Test with special characters that HTML handles naturally
                 articles = [
                     ScoredArticle(
                         guid="test-guid-1", 
@@ -204,17 +204,17 @@ class TestPostCreator:
                 
                 result = creator._create_fallback_post(articles)
                 
-                # Check that MarkdownV2 special characters are properly handled
-                assert "AI & ML: The Future of Technology\\!" in result
+                # Check that special characters are handled naturally in HTML
+                assert "AI & ML: The Future of Technology!" in result
                 assert "TechCrunch & Wired" in result
                 assert "https://example.com/test?param=value&other=tag" in result
-                assert "\\*bold\\* AI developments & future technologies" in result
+                assert "*bold* AI developments & future technologies" in result
                 
-                # Ensure proper MarkdownV2 formatting
-                assert "*🤖 AI Agent Digest Update*" in result
-                assert "_1 new articles about AI agents and autonomous systems:_" in result
-                assert "[AI & ML: The Future of Technology\\!](https://example.com/test?param=value&other=tag)" in result
-                assert "`TechCrunch & Wired`" in result
-                assert "_This article discusses \\*bold\\* AI developments & future technologies_" in result
-                assert "*Stay tuned for more AI agent developments\\!* 🚀" in result
+                # Ensure proper HTML formatting
+                assert "<b>🤖 AI Agent Digest Update</b>" in result
+                assert "<i>1 new articles about AI agents and autonomous systems:</i>" in result
+                assert '<a href="https://example.com/test?param=value&other=tag">AI & ML: The Future of Technology!</a>' in result
+                assert "<code>TechCrunch & Wired</code>" in result
+                assert "<i>This article discusses *bold* AI developments & future technologies</i>" in result
+                assert "<b>Stay tuned for more AI agent developments!</b> 🚀" in result
 

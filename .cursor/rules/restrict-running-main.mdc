@@ -1,0 +1,4 @@
+---
+alwaysApply: true
+---
+Never run python main.py command to test what you are doing.

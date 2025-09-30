@@ -33,7 +33,8 @@ async def send_async(post_text: str) -> int:
         message = await bot.send_message(
             chat_id=chat_id,
             text=post_text,
-            parse_mode=parse_mode
+            parse_mode=parse_mode,
+            disable_web_page_preview=True
         )
         
         logging.info(f"Successfully sent message to Telegram. Message ID: {message.message_id}")

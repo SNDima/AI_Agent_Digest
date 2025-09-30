@@ -33,16 +33,16 @@ class PostCreator:
         formatted_articles = []
         for i, article in enumerate(articles_to_include, 1):
             article_text = f"{i}. {article.title}"
+            if article.link:
+                article_text += f"\n   Link: {article.link}"
             if article.summary:
-                article_text += f"\n   {article.summary[:200]}{'...' if len(article.summary) > 200 else ''}"
+                article_text += f"\n   Summary: {article.summary[:200]}{'...' if len(article.summary) > 200 else ''}"
+            if article.reasoning:
+                article_text += f"\n   🎯 WHY THIS MATTERS: {article.reasoning}"
             if article.source:
                 article_text += f"\n   Source: {article.source}"
             if article.published_at:
                 article_text += f"\n   Published: {article.published_at.strftime('%Y-%m-%d %H:%M')}"
-            if article.link:
-                article_text += f"\n   Link: {article.link}"
-            if article.reasoning:
-                article_text += f"\n   AI Analysis: {article.reasoning}"
             
             formatted_articles.append(article_text)
         
@@ -72,6 +72,7 @@ class PostCreator:
             response = self.chat_model.invoke(messages)
             post_text = response.content.strip()
             
+            logging.info(f"The post text is: {post_text}")
             logging.info("Successfully created social media post")
             return post_text
             
@@ -85,50 +86,34 @@ class PostCreator:
         logging.warning("Using fallback post generation")
         
         post_lines = [
-            "*🤖 AI Agent Digest Update*",
+            "<b>🤖 AI Agent Digest Update</b>",
             "",
-            f"📰 _{len(articles)} new articles about AI agents and autonomous systems:_",
+            f"📰 <i>{len(articles)} new articles about AI agents and autonomous systems:</i>",
             ""
         ]
         
         # Add top 3 articles with links
         for i, article in enumerate(articles[:3], 1):
-            # Escape special characters in title and reasoning
-            escaped_title = self._escape_markdownv2(article.title)
-            escaped_source = self._escape_markdownv2(article.source) if article.source else ""
-            
             if article.link:
-                post_lines.append(f"{i}\\. [{escaped_title}]({article.link})")
+                post_lines.append(f"{i}. <a href=\"{article.link}\">{article.title}</a>")
             else:
-                post_lines.append(f"{i}\\. {escaped_title}")
+                post_lines.append(f"{i}. {article.title}")
             
             if article.source:
-                post_lines.append(f"   📍 `{escaped_source}`")
+                post_lines.append(f"   📍 <code>{article.source}</code>")
             
             # Add AI reasoning if available
             if article.reasoning:
                 reasoning_preview = article.reasoning[:100] + "..." if len(article.reasoning) > 100 else article.reasoning
-                escaped_reasoning = self._escape_markdownv2(reasoning_preview)
-                post_lines.append(f"   💡 _{escaped_reasoning}_")
+                post_lines.append(f"   💡 <i>{reasoning_preview}</i>")
             
             post_lines.append("")
         
         # Add footer
         post_lines.extend([
-            "*Stay tuned for more AI agent developments\\!* 🚀"
+            "<b>Stay tuned for more AI agent developments!</b> 🚀"
         ])
         
         return "\n".join(post_lines)
     
-    def _escape_markdownv2(self, text: str) -> str:
-        """Escape special characters for MarkdownV2 format."""
-        import re
-        
-        # Characters that need to be escaped in MarkdownV2
-        special_chars = r'[\.\!\-\_\[\]\(\)\{\}\+\*\`\|\~\=\>\#]'
-        
-        # Escape special characters
-        text = re.sub(special_chars, r'\\\g<0>', text)
-        
-        return text
     
