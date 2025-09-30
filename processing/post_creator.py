@@ -72,9 +72,6 @@ class PostCreator:
             response = self.chat_model.invoke(messages)
             post_text = response.content.strip()
             
-            # Clean the HTML to be compatible with Telegram
-            post_text = self._clean_telegram_html(post_text)
-            
             logging.info("Successfully created social media post")
             return post_text
             
@@ -88,67 +85,50 @@ class PostCreator:
         logging.warning("Using fallback post generation")
         
         post_lines = [
-            "<b>🤖 AI Agent Digest Update</b>",
+            "*🤖 AI Agent Digest Update*",
             "",
-            f"📰 <i>{len(articles)} new articles about AI agents and autonomous systems:</i>",
+            f"📰 _{len(articles)} new articles about AI agents and autonomous systems:_",
             ""
         ]
         
         # Add top 3 articles with links
         for i, article in enumerate(articles[:3], 1):
-            # Escape HTML characters in title and link
-            escaped_title = html.escape(article.title)
-            escaped_link = html.escape(str(article.link), quote=True) if article.link else None
+            # Escape special characters in title and reasoning
+            escaped_title = self._escape_markdownv2(article.title)
+            escaped_source = self._escape_markdownv2(article.source) if article.source else ""
             
             if article.link:
-                post_lines.append(f"{i}. <a href=\"{escaped_link}\">{escaped_title}</a>")
+                post_lines.append(f"{i}\\. [{escaped_title}]({article.link})")
             else:
-                post_lines.append(f"{i}. {escaped_title}")
+                post_lines.append(f"{i}\\. {escaped_title}")
             
             if article.source:
-                # Escape HTML characters in source
-                escaped_source = html.escape(article.source)
-                post_lines.append(f"   📍 <code>{escaped_source}</code>")
+                post_lines.append(f"   📍 `{escaped_source}`")
             
             # Add AI reasoning if available
             if article.reasoning:
                 reasoning_preview = article.reasoning[:100] + "..." if len(article.reasoning) > 100 else article.reasoning
-                # Escape HTML characters in reasoning
-                escaped_reasoning = html.escape(reasoning_preview)
-                post_lines.append(f"   💡 <i>{escaped_reasoning}</i>")
+                escaped_reasoning = self._escape_markdownv2(reasoning_preview)
+                post_lines.append(f"   💡 _{escaped_reasoning}_")
             
             post_lines.append("")
         
         # Add footer
         post_lines.extend([
-            "<b>Stay tuned for more AI agent developments!</b> 🚀"
+            "*Stay tuned for more AI agent developments\\!* 🚀"
         ])
         
         return "\n".join(post_lines)
     
-    def _clean_telegram_html(self, text: str) -> str:
-        """Clean HTML text to be compatible with Telegram's HTML parser."""
+    def _escape_markdownv2(self, text: str) -> str:
+        """Escape special characters for MarkdownV2 format."""
         import re
         
-        # Replace <br> and <br/> tags with newlines
-        text = text.replace("<br>", "\n").replace("<br/>", "\n").replace("<br />", "\n")
+        # Characters that need to be escaped in MarkdownV2
+        special_chars = r'[\.\!\-\_\[\]\(\)\{\}\+\*\`\|\~\=\>\#]'
         
-        # Convert HTML lists to plain text format
-        # Replace <ul> and </ul> with empty string
-        text = text.replace("<ul>", "").replace("</ul>", "")
-        
-        # Replace <li> and </li> with bullet points
-        text = text.replace("<li>", "• ").replace("</li>", "\n")
-        
-        # Remove any other unsupported HTML tags that might cause issues
-        # Telegram supports: <b>, <i>, <u>, <s>, <code>, <pre>, <a>, <tg-spoiler>
-        # Remove other common unsupported tags
-        unsupported_tags = ['<ol>', '</ol>', '<p>', '</p>', '<div>', '</div>', '<span>', '</span>', '<strong>', '</strong>', '<em>', '</em>']
-        for tag in unsupported_tags:
-            text = text.replace(tag, "")
-        
-        # Clean up extra whitespace and newlines
-        text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)  # Replace multiple newlines with double newlines
-        text = text.strip()
+        # Escape special characters
+        text = re.sub(special_chars, r'\\\g<0>', text)
         
         return text
+    

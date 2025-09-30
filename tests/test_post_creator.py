@@ -71,7 +71,7 @@ class TestPostCreator:
             with patch('processing.post_creator.init_chat_model') as mock_init_chat:
                 mock_chat_model = MagicMock()
                 mock_response = MagicMock()
-                mock_response.content = "<b>🤖 AI Agent Digest:</b> Exciting developments in AI agents!"
+                mock_response.content = "*🤖 AI Agent Digest:* Exciting developments in AI agents!"
                 mock_chat_model.invoke.return_value = mock_response
                 mock_init_chat.return_value = mock_chat_model
                 
@@ -85,7 +85,7 @@ class TestPostCreator:
                 
                 result = creator.create_post(articles)
                 
-                assert "<b>🤖 AI Agent Digest:</b>" in result
+                assert "*🤖 AI Agent Digest:*" in result
                 mock_chat_model.invoke.assert_called_once()
     
     def test_create_post_fallback(self):
@@ -119,16 +119,16 @@ class TestPostCreator:
                 
                 result = creator.create_post(articles)
                 
-                assert "<b>🤖 AI Agent Digest Update</b>" in result
+                assert "*🤖 AI Agent Digest Update*" in result
                 assert "2 new articles" in result
-                assert "1. <a href=\"https://example.com/1\">Test Article 1</a>" in result
-                assert "2. <a href=\"https://example.com/2\">Test Article 2</a>" in result
-                assert "<code>Test Source 1</code>" in result
-                assert "<code>Test Source 2</code>" in result
-                assert "<b>Stay tuned for more AI agent developments!</b>" in result
+                assert "1\\. [Test Article 1](https://example.com/1)" in result
+                assert "2\\. [Test Article 2](https://example.com/2)" in result
+                assert "`Test Source 1`" in result
+                assert "`Test Source 2`" in result
+                assert "*Stay tuned for more AI agent developments\\!*" in result
     
-    def test_fallback_post_html_formatting(self):
-        """Test that fallback post generates proper HTML formatting."""
+    def test_fallback_post_markdownv2_formatting(self):
+        """Test that fallback post generates proper MarkdownV2 formatting."""
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
@@ -161,16 +161,16 @@ class TestPostCreator:
                 
                 result = creator._create_fallback_post(articles)
                 
-                # Check HTML formatting elements
-                assert "<b>🤖 AI Agent Digest Update</b>" in result
-                assert "<i>1 new articles about AI agents and autonomous systems:</i>" in result
-                assert "<a href=\"https://techcrunch.com/ai-agent-framework\">AI Agent Framework Released</a>" in result
-                assert "<code>TechCrunch</code>" in result
-                assert "<i>This is a groundbreaking development in AI agent technology that will enable developers to build mor...</i>" in result
-                assert "<b>Stay tuned for more AI agent developments!</b> 🚀" in result
+                # Check MarkdownV2 formatting elements
+                assert "*🤖 AI Agent Digest Update*" in result
+                assert "_1 new articles about AI agents and autonomous systems:_" in result
+                assert "[AI Agent Framework Released](https://techcrunch.com/ai-agent-framework)" in result
+                assert "`TechCrunch`" in result
+                assert "_This is a groundbreaking development in AI agent technology that will enable developers to build mor\\.\\.\\._" in result
+                assert "*Stay tuned for more AI agent developments\\!* 🚀" in result
 
-    def test_fallback_post_html_escaping(self):
-        """Test that fallback post properly escapes HTML characters."""
+    def test_fallback_post_markdownv2_escaping(self):
+        """Test that fallback post properly handles MarkdownV2 special characters."""
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
@@ -189,31 +189,32 @@ class TestPostCreator:
                 
                 creator = PostCreator("test_config.yaml")
                 
-                # Test with problematic HTML characters
+                # Test with MarkdownV2 special characters
                 articles = [
                     ScoredArticle(
                         guid="test-guid-1", 
-                        title="AI & ML: The Future of <script>alert('hack')</script> Technology", 
-                        summary="Test summary", 
+                        title="AI & ML: The Future of Technology!", 
+                        summary="Test summary with special chars: *bold* _italic_ [link](url)", 
                         source="TechCrunch & Wired", 
-                        link="https://example.com/test?param=\"value\"&other=<tag>", 
+                        link="https://example.com/test?param=value&other=tag", 
                         published_at=datetime.now(),
-                        reasoning="This article discusses <b>bold</b> AI developments & future <script>dangerous</script> technologies"
+                        reasoning="This article discusses *bold* AI developments & future technologies"
                     )
                 ]
                 
                 result = creator._create_fallback_post(articles)
                 
-                # Check that HTML characters are properly escaped
-                assert "AI &amp; ML: The Future of &lt;script&gt;alert(&#x27;hack&#x27;)&lt;/script&gt; Technology" in result
-                assert "TechCrunch &amp; Wired" in result
-                # URL gets URL-encoded by Pydantic HttpUrl, then HTML-escaped
-                assert "https://example.com/test?param=%22value%22&amp;other=%3Ctag%3E" in result
-                assert "&lt;b&gt;bold&lt;/b&gt; AI developments &amp; future &lt;script&gt;dangerous&lt;/script&gt;" in result
+                # Check that MarkdownV2 special characters are properly handled
+                assert "AI & ML: The Future of Technology\\!" in result
+                assert "TechCrunch & Wired" in result
+                assert "https://example.com/test?param=value&other=tag" in result
+                assert "\\*bold\\* AI developments & future technologies" in result
                 
-                # Ensure no unescaped HTML characters remain
-                assert "<script>" not in result
-                assert "</script>" not in result
-                assert "&amp;" in result  # Should be escaped as &amp;
-                assert "&lt;script&gt;" in result  # Script tags should be escaped
-                assert "&lt;b&gt;" in result  # HTML tags should be escaped
+                # Ensure proper MarkdownV2 formatting
+                assert "*🤖 AI Agent Digest Update*" in result
+                assert "_1 new articles about AI agents and autonomous systems:_" in result
+                assert "[AI & ML: The Future of Technology\\!](https://example.com/test?param=value&other=tag)" in result
+                assert "`TechCrunch & Wired`" in result
+                assert "_This article discusses \\*bold\\* AI developments & future technologies_" in result
+                assert "*Stay tuned for more AI agent developments\\!* 🚀" in result
+

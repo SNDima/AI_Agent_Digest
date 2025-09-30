@@ -4,37 +4,40 @@ post_creator:
     model_provider: "openai"
     temperature: 0.7
   post_prompt: |
-    You are creating an engaging social media post for an AI Agent Digest newsletter. Based on the provided scored articles with AI analysis, create a compelling post that will be sent via Telegram with HTML formatting.
+    You are creating an engaging social media post for an AI Agent Digest newsletter. Based on the provided scored articles with AI analysis, create a compelling post that will be sent via Telegram with MarkdownV2 formatting.
     
     Requirements:
     - Keep it concise but engaging (aim for 2-4 paragraphs)
-    - Start with a hook that grabs attention using <b>bold text</b>
+    - Start with a hook that grabs attention using *bold text*
     - Highlight the most interesting and relevant developments based on the AI analysis
     - Use emojis sparingly but effectively
     - Include a call-to-action or forward-looking statement
     - Make it feel personal and conversational
     - Focus on what makes these developments significant for AI agents and autonomous systems
-    - IMPORTANT: Format the post using HTML tags for better readability
-    - Use <b>bold</b> for emphasis and <i>italic</i> for highlights
-    - Include clickable links using HTML format: <a href="URL">Article Title</a>
-    - Use <code>monospace</code> for technical terms or code snippets
+    - IMPORTANT: Format the post using MarkdownV2 syntax for better readability
+    - Use *bold* for emphasis and _italic_ for highlights
+    - Include clickable links using MarkdownV2 format: [Article Title](URL)
+    - Use `monospace` for technical terms or code snippets
     - Leverage the AI analysis to emphasize the most important insights
-    - Format article lists with proper HTML structure
+    - Format article lists with bullet points (•) or numbered lists (1., 2., 3.)
     
-    HTML Formatting Guidelines:
-    - Use <b>text</b> for bold emphasis
-    - Use <i>text</i> for italic highlights  
-    - Use <code>text</code> for technical terms
-    - Use <a href="url">link text</a> for clickable links
+    MarkdownV2 Formatting Guidelines:
+    - Use *text* for bold emphasis
+    - Use _text_ for italic highlights  
+    - Use __text__ for underlined text
+    - Use ~text~ for strikethrough text
+    - Use `text` for monospace/code
+    - Use ```text``` for preformatted text
+    - Use [text](url) for clickable links
     - Use line breaks (\n) for paragraph separation
-    - IMPORTANT: Do NOT use <br>, <ul>, <li>, <ol>, <p>, <div> tags - use \n for line breaks instead
-    - For lists, use bullet points (•) or numbered lists (1., 2., 3.) with newlines
-    - Only use supported Telegram HTML tags: <b>, <i>, <u>, <s>, <code>, <pre>, <a>
+    - For lists, use bullet points (•) or numbered lists (1\., 2\., 3\.) with newlines
+    - Escape special characters: . ! - ( ) [ ] + * _ ` | ~ = > # with backslashes
+    - IMPORTANT: Escape all special MarkdownV2 characters with backslashes
     
     Top Articles ({article_count}) with AI Analysis:
     {articles_text}
     
-    Create an engaging HTML-formatted post that includes clickable links to the articles and leverages the AI analysis to highlight the most significant developments:
+    Create an engaging MarkdownV2-formatted post that includes clickable links to the articles and leverages the AI analysis to highlight the most significant developments:
   system_message: "You are a skilled social media content creator who specializes in making technical AI news engaging and accessible. You excel at creating posts that are both informative and compelling for a technical audience interested in AI agents and autonomous systems."
   max_articles_in_post: 5
   include_article_links: true
