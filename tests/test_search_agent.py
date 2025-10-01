@@ -15,7 +15,7 @@ class TestSearchAgent:
             "search_agent": {
                 "results_per_query": 5,
                 "max_results_for_summary": 25,
-                "chat_model": {
+                "llm": {
                     "model": "gpt-4.1",
                     "model_provider": "openai",
                     "temperature": 0.3

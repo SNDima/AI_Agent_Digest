@@ -27,7 +27,7 @@ class RelevanceScorer:
             
         # Initialize LangChain chat model for scoring
         scoring_config = self.config["scoring"]
-        chat_model_config = scoring_config["chat_model"]
+        chat_model_config = scoring_config["llm"]
         self.chat_model = init_chat_model(
             model=chat_model_config["model"],
             model_provider=chat_model_config["model_provider"],

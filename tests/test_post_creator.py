@@ -16,7 +16,7 @@ class TestPostCreator:
             mock_config = {
                 "post_creator": {
                     "max_articles_in_post": 3,
-                    "chat_model": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7}
+                    "llm": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7}
                 }
             }
             mock_load_config.return_value = mock_config
@@ -60,7 +60,7 @@ class TestPostCreator:
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
-                    "chat_model": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
+                    "llm": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
                     "max_articles_in_post": 5,
                     "post_prompt": "Create post for articles:\n{articles_text}",
                     "system_message": "You are a post creator"
@@ -93,7 +93,7 @@ class TestPostCreator:
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
-                    "chat_model": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
+                    "llm": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
                     "max_articles_in_post": 5,
                     "post_prompt": "Test prompt",
                     "system_message": "Test system message"
@@ -132,7 +132,7 @@ class TestPostCreator:
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
-                    "chat_model": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
+                    "llm": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
                     "max_articles_in_post": 5,
                     "post_prompt": "Test prompt",
                     "system_message": "Test system message"
@@ -174,7 +174,7 @@ class TestPostCreator:
         with patch('processing.post_creator.load_config') as mock_load_config:
             mock_config = {
                 "post_creator": {
-                    "chat_model": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
+                    "llm": {"model": "gpt-4.1", "model_provider": "openai", "temperature": 0.7},
                     "max_articles_in_post": 5,
                     "post_prompt": "Test prompt",
                     "system_message": "Test system message"

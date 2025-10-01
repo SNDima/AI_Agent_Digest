@@ -18,7 +18,7 @@ class PostCreator:
         self.config = load_config(config_path)
         
         # Initialize LangChain chat model
-        chat_model_config = self.config["post_creator"]["chat_model"]
+        chat_model_config = self.config["post_creator"]["llm"]
         self.chat_model = init_chat_model(
             model=chat_model_config["model"],
             model_provider=chat_model_config["model_provider"],

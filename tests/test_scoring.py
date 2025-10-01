@@ -14,7 +14,7 @@ class TestRelevanceScorer:
         """Create a test scoring configuration file."""
         config_data = {
             "scoring": {
-                "chat_model": {
+                "llm": {
                     "model": "gpt-4",
                     "model_provider": "openai",
                     "temperature": 0.1

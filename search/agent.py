@@ -29,7 +29,7 @@ class SearchAgent:
             raise ValueError("OPENAI_API_KEY environment variable is required")
             
         # Initialize LangChain chat model
-        chat_model_config = self.config["search_agent"]["chat_model"]
+        chat_model_config = self.config["search_agent"]["llm"]
         self.chat_model = init_chat_model(
             model=chat_model_config["model"],
             model_provider=chat_model_config["model_provider"],

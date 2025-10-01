@@ -176,7 +176,7 @@ sources:
 ### Scoring Configuration (`config/scoring.yaml`)
 ```yaml
 scoring:
-  chat_model:
+  llm:
     model: "gpt-4.1"
     model_provider: "openai"
     temperature: 0.1
@@ -200,7 +200,7 @@ search_agent:
 ### Post Creator Configuration (`config/post_creator.yaml`)
 ```yaml
 post_creator:
-  chat_model:
+  llm:
     model: "gpt-4.1"
     model_provider: "openai"
     temperature: 0.7
