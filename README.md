@@ -60,7 +60,7 @@ ai-agent-digest/
 ├── search/            # Web search and summarization
 │   └── agent.py       # Search agent with SerpAPI integration
 ├── models/            # Data models (Pydantic)
-│   ├── article.py     # Article and ScoredArticle models with relevance scoring
+│   ├── article.py     # Article model
 │   ├── search_result.py # Search result model
 │   ├── search_summary.py # Search summary model
 │   └── delivery.py    # Delivery model

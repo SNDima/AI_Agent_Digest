@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from langchain.chat_models import init_chat_model
 from utils.config import load_config
 from utils.constants import SCORING_CONFIG_PATH
-from models.article import Article, ScoredArticle
+from models.article import Article
 
 
 class RelevanceScore(BaseModel):
@@ -76,7 +76,7 @@ class RelevanceScorer:
             logging.error(f"Failed to score article '{article.title}': {e}")
             return None, None
     
-    def score_articles(self, articles: List[Article]) -> List[ScoredArticle]:
+    def score_articles(self, articles: List[Article]) -> List[Article]:
         """Score multiple articles for relevance to AI agent content."""
         logging.info(f"Scoring {len(articles)} articles for relevance...")
         
@@ -88,29 +88,13 @@ class RelevanceScorer:
             if article.relevance_score is not None:
                 logging.debug(f"Skipping article '{article.title}' - already scored with score: {article.relevance_score}")
                 skipped_count += 1
-                
-                # Convert existing Article to ScoredArticle preserving existing score
-                scored_article = ScoredArticle(
-                    guid=article.guid,
-                    source=article.source,
-                    title=article.title,
-                    link=article.link,
-                    summary=article.summary,
-                    author=article.author,
-                    categories=article.categories,
-                    published_at=article.published_at,
-                    fetched_at=article.fetched_at,
-                    posted=article.posted,
-                    relevance_score=article.relevance_score,
-                    reasoning=getattr(article, 'reasoning', None)  # Preserve existing reasoning if available
-                )
-                scored_articles.append(scored_article)
+                scored_articles.append(article)
                 continue
             
             score, reasoning = self._score_article(article)
             
-            # Create a ScoredArticle with the relevance score and reasoning
-            scored_article = ScoredArticle(
+            # Create an Article with the relevance score and reasoning
+            scored_article = Article(
                 guid=article.guid,
                 source=article.source,
                 title=article.title,
@@ -139,7 +123,7 @@ class RelevanceScorer:
         return scored_articles
 
 
-def assign_relevance_score(articles: List[Article], relevance_text: str) -> List[ScoredArticle]:
+def assign_relevance_score(articles: List[Article], relevance_text: str) -> List[Article]:
     """
     Calculate relevance scores for AI Agent content using LLM-based scoring.
     
@@ -148,7 +132,7 @@ def assign_relevance_score(articles: List[Article], relevance_text: str) -> List
         relevance_text: Summary text used as context for scoring (currently unused but kept for compatibility)
         
     Returns:
-        List of ScoredArticle objects with relevance_score and reasoning fields populated
+        List of Article objects with relevance_score and reasoning fields populated
     """
     try:
         # Initialize scorer with scoring config

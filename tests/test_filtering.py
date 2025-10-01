@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
 from processing.filtering import filter_top_articles
-from models.article import ScoredArticle
+from models.article import Article
 
 
 class TestFilterTopArticles:
@@ -9,7 +9,7 @@ class TestFilterTopArticles:
 
     def create_scored_article(self, title, score, reasoning="Test reasoning"):
         """Create a test scored article."""
-        return ScoredArticle(
+        return Article(
             guid=f"test-guid-{title.lower().replace(' ', '-')}",
             source="Test Source",
             title=title,

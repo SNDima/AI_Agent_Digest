@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 
 from processing.post_creator import PostCreator
-from models.article import ScoredArticle
+from models.article import Article
 
 
 class TestPostCreator:
@@ -25,7 +25,7 @@ class TestPostCreator:
                 creator = PostCreator("test_config.yaml")
                 
                 articles = [
-                    ScoredArticle(
+                    Article(
                         guid="test-guid-1",
                         title="Test Article 1",
                         summary="This is a test summary for article 1",
@@ -34,7 +34,7 @@ class TestPostCreator:
                         published_at=datetime(2024, 1, 1),
                         reasoning="Highly relevant to AI agents due to direct framework discussion"
                     ),
-                    ScoredArticle(
+                    Article(
                         guid="test-guid-2",
                         title="Test Article 2",
                         summary="This is a test summary for article 2",
@@ -78,7 +78,7 @@ class TestPostCreator:
                 creator = PostCreator("test_config.yaml")
                 
                 articles = [
-                    ScoredArticle(guid="test-guid", title="Test Article", summary="Test summary", 
+                    Article(guid="test-guid", title="Test Article", summary="Test summary", 
                                 source="Test Source", link="https://example.com", published_at=datetime.now(),
                                 reasoning="Excellent AI agent content")
                 ]
@@ -109,10 +109,10 @@ class TestPostCreator:
                 creator = PostCreator("test_config.yaml")
                 
                 articles = [
-                    ScoredArticle(guid="test-guid-1", title="Test Article 1", summary="Test summary 1", 
+                    Article(guid="test-guid-1", title="Test Article 1", summary="Test summary 1", 
                                 source="Test Source 1", link="https://example.com/1", published_at=datetime.now(),
                                 reasoning="High relevance for AI agents"),
-                    ScoredArticle(guid="test-guid-2", title="Test Article 2", summary="Test summary 2", 
+                    Article(guid="test-guid-2", title="Test Article 2", summary="Test summary 2", 
                                 source="Test Source 2", link="https://example.com/2", published_at=datetime.now(),
                                 reasoning="Good AI agent applications")
                 ]
@@ -148,7 +148,7 @@ class TestPostCreator:
                 creator = PostCreator("test_config.yaml")
                 
                 articles = [
-                    ScoredArticle(
+                    Article(
                         guid="test-guid-1", 
                         title="AI Agent Framework Released", 
                         summary="New framework for building AI agents", 
@@ -191,7 +191,7 @@ class TestPostCreator:
                 
                 # Test with special characters that HTML handles naturally
                 articles = [
-                    ScoredArticle(
+                    Article(
                         guid="test-guid-1", 
                         title="AI & ML: The Future of Technology!", 
                         summary="Test summary with special chars: *bold* _italic_ [link](url)", 

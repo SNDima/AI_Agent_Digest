@@ -7,7 +7,7 @@ import logging
 from typing import List
 from langchain.chat_models import init_chat_model
 from utils.config import load_config
-from models.article import ScoredArticle
+from models.article import Article
 
 
 class PostCreator:
@@ -25,7 +25,7 @@ class PostCreator:
             temperature=chat_model_config["temperature"]
         )
     
-    def _format_articles_for_post(self, articles: List[ScoredArticle]) -> str:
+    def _format_articles_for_post(self, articles: List[Article]) -> str:
         """Format articles for inclusion in the post prompt."""
         max_articles = self.config["post_creator"]["max_articles_in_post"]
         articles_to_include = articles[:max_articles]
@@ -48,7 +48,7 @@ class PostCreator:
         
         return "\n\n".join(formatted_articles)
     
-    def create_post(self, articles: List[ScoredArticle]) -> str:
+    def create_post(self, articles: List[Article]) -> str:
         """Create an engaging social media post from articles."""
         logging.info("Creating social media post...")
         
@@ -80,7 +80,7 @@ class PostCreator:
             # Fallback to a simple post if LLM fails
             return self._create_fallback_post(articles)
     
-    def _create_fallback_post(self, articles: List[ScoredArticle]) -> str:
+    def _create_fallback_post(self, articles: List[Article]) -> str:
         """Create a simple fallback post if LLM generation fails."""
         logging.warning("Using fallback post generation")
         

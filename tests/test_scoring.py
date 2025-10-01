@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from unittest.mock import patch, MagicMock
 
 from processing.scoring import RelevanceScorer
-from models.article import Article, ScoredArticle
+from models.article import Article
 
 
 class TestRelevanceScorer:
@@ -111,7 +111,7 @@ class TestRelevanceScorer:
         scored_articles = scorer.score_articles(articles)
         
         assert len(scored_articles) == 2
-        assert all(isinstance(article, ScoredArticle) for article in scored_articles)
+        assert all(isinstance(article, Article) for article in scored_articles)
         assert scored_articles[0].relevance_score == 85
         assert scored_articles[1].relevance_score == 70
 
@@ -167,7 +167,7 @@ class TestRelevanceScorer:
         
         # Verify results
         assert len(scored_articles) == 2
-        assert all(isinstance(article, ScoredArticle) for article in scored_articles)
+        assert all(isinstance(article, Article) for article in scored_articles)
         
         # Find the articles by their GUIDs
         scored_by_guid = {article.guid: article for article in scored_articles}

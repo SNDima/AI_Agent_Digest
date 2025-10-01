@@ -4,10 +4,10 @@ Article filtering module for selecting top articles based on relevance scores.
 
 import logging
 from typing import List
-from models.article import ScoredArticle
+from models.article import Article
 
 
-def filter_top_articles(scored_articles: List[ScoredArticle]) -> List[ScoredArticle]:
+def filter_top_articles(scored_articles: List[Article]) -> List[Article]:
     """
     Filter and order articles by relevance score.
     
@@ -17,10 +17,10 @@ def filter_top_articles(scored_articles: List[ScoredArticle]) -> List[ScoredArti
     - Articles with None scores are filtered out
     
     Args:
-        scored_articles: List of ScoredArticle objects with relevance scores and reasoning
+        scored_articles: List of Article objects with relevance scores and reasoning
         
     Returns:
-        List of top ScoredArticle objects selected based on relevance scores
+        List of top Article objects selected based on relevance scores
     """
     logging.info("Filtering top articles by relevance score...")
     

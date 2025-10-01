@@ -63,7 +63,7 @@ def get_articles_after(config_path: str, after_datetime: datetime) -> List[Artic
         cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT guid, source, title, link, summary, author, categories, published_at, fetched_at, posted, relevance_score
+            SELECT guid, source, title, link, summary, author, categories, published_at, fetched_at, posted, relevance_score, relevance_prescore, reasoning
             FROM rss_entries
             WHERE published_at > ?
             ORDER BY published_at DESC
@@ -97,7 +97,9 @@ def get_articles_after(config_path: str, after_datetime: datetime) -> List[Artic
                 published_at=published_at,
                 fetched_at=fetched_at,
                 posted=bool(row['posted']),
-                relevance_score=row['relevance_score']
+                relevance_score=row['relevance_score'],
+                relevance_prescore=row['relevance_prescore'],
+                reasoning=row['reasoning']
             )
             articles.append(article)
         
@@ -108,10 +110,10 @@ def get_articles_after(config_path: str, after_datetime: datetime) -> List[Artic
 
 def update_relevance_scores(articles: List[Article], config_path: str) -> None:
     """
-    Update relevance scores for articles in the database.
+    Update relevance scores, prescores, and reasoning for articles in the database.
     
     Args:
-        articles: List of Article objects with relevance_score populated
+        articles: List of Article objects with relevance_score, relevance_prescore, and reasoning populated
         config_path: Path to the database configuration file
     """
     if not articles:
@@ -125,9 +127,11 @@ def update_relevance_scores(articles: List[Article], config_path: str) -> None:
         # Prepare data for batch update
         batch_data = []
         for article in articles:
-            if article.relevance_score is not None:
+            if article.relevance_score is not None or article.relevance_prescore is not None or article.reasoning is not None:
                 batch_data.append((
                     article.relevance_score,
+                    article.relevance_prescore,
+                    article.reasoning,
                     article.guid
                 ))
         
@@ -138,7 +142,7 @@ def update_relevance_scores(articles: List[Article], config_path: str) -> None:
         cursor.executemany(
             """
             UPDATE rss_entries 
-            SET relevance_score = ?
+            SET relevance_score = ?, relevance_prescore = ?, reasoning = ?
             WHERE guid = ?
             """,
             batch_data
