@@ -15,6 +15,21 @@
             "envFile": "${workspaceFolder}/.env",
             "stopOnEntry": false,
             "args": []
+        },
+        {
+            "name": "Debug Search Agent",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/search/agent.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}",
+                "PYTHONUNBUFFERED": "1"
+            },
+            "envFile": "${workspaceFolder}/.env",
+            "stopOnEntry": false,
+            "args": []
         }
     ]
 }

@@ -1,32 +1,33 @@
 search_agent:
-  engine: google
-  freshness: last_24h
   results_per_query: 5
   max_results_for_summary: 25
+  serpapi_params:
+    gl: "us"
+    hl: "en"
+    tbm: "nws"  # news
+    tbs: "qdr:d"  # last 24 hours
   chat_model:
     model: "gpt-4.1"
     model_provider: "openai"
     temperature: 0.3
   summary_prompt: |
-    Please provide an engaging summary of the following search results for the query "{query}".
-    Focus on the most trending, interesting, and newsworthy information that would be compelling to read.
-    Highlight:
-    - Breaking news and recent developments
-    - Controversial or surprising findings
-    - Industry trends and emerging patterns
-    - Expert opinions and insights
-    - Future implications and predictions
+    Create a concise summary of trending topics from these search results for "{query}".
     
-    Make the summary engaging and informative, emphasizing what makes each piece of information particularly interesting or significant.
+    Include:
+    - Key trending topics
+    - Recent developments
+    - New releases
+    
+    Keep it factual and brief.
     
     Search Results:
     {content_text}
     
     Summary:
-  system_message: "You are a skilled content curator and trend analyst who creates engaging summaries by identifying the most interesting, trending, and newsworthy information from search results. You excel at highlighting what makes information compelling and significant."
+  system_message: "You are a technical analyst who creates factual summaries of news and industry developments. Your summaries help identify trending topics and patterns that are useful for content scoring and trend analysis. Focus on objective facts, recent developments, and industry movements rather than subjective opinions."
   queries:
   - AI Agents
-  - LangChain agents
-  - autonomous AI agents
-  - multi-agent systems
-  - CrewAI OR AutoGen agents
+  - LangChain OR LangGraph
+  - Anthropic OR OpenAI
+  - LLM
+  - CrewAI OR AutoGen
