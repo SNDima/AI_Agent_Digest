@@ -41,7 +41,7 @@ class RelevanceScorer:
         self.system_message = scoring_config["system_message"]
     
     
-    def _score_article(self, article: Article) -> tuple[Optional[int], Optional[str]]:
+    def _score_article(self, article: Article, relevance_text: str) -> tuple[Optional[int], Optional[str]]:
         """Score a single article for relevance to AI agent content."""
         try:
             # Prepare article data for scoring
@@ -49,7 +49,7 @@ class RelevanceScorer:
                 "title": article.title,
                 "summary": article.summary or "No summary available",
                 "source": article.source,
-                "published_at": article.published_at.strftime("%Y-%m-%d %H:%M:%S") if article.published_at else "Unknown"
+                "relevance_text": relevance_text or "No reference context available"
             }
             
             # Format the scoring prompt
@@ -76,7 +76,7 @@ class RelevanceScorer:
             logging.error(f"Failed to score article '{article.title}': {e}")
             return None, None
     
-    def score_articles(self, articles: List[Article]) -> List[Article]:
+    def score_articles(self, articles: List[Article], relevance_text: str) -> List[Article]:
         """Score multiple articles for relevance to AI agent content."""
         logging.info(f"Scoring {len(articles)} articles for relevance...")
         
@@ -91,7 +91,7 @@ class RelevanceScorer:
                 scored_articles.append(article)
                 continue
             
-            score, reasoning = self._score_article(article)
+            score, reasoning = self._score_article(article, relevance_text)
             
             # Create an Article with the relevance score and reasoning
             scored_article = Article(
@@ -129,7 +129,7 @@ def assign_relevance_score(articles: List[Article], relevance_text: str) -> List
     
     Args:
         articles: List of articles to score
-        relevance_text: Summary text used as context for scoring (currently unused but kept for compatibility)
+        relevance_text: Summary text used as context for scoring (trending AI agent news)
         
     Returns:
         List of Article objects with relevance_score and reasoning fields populated
@@ -138,8 +138,8 @@ def assign_relevance_score(articles: List[Article], relevance_text: str) -> List
         # Initialize scorer with scoring config
         scorer = RelevanceScorer(SCORING_CONFIG_PATH)
         
-        # Score all articles
-        return scorer.score_articles(articles)
+        # Score all articles using the relevance_text as reference context
+        return scorer.score_articles(articles, relevance_text)
         
     except Exception as e:
         logging.error(f"Failed to assign relevance scores: {e}")

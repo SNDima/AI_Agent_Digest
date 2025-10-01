@@ -61,8 +61,9 @@ class TestRelevanceScorer:
         
         scorer = RelevanceScorer(config_path)
         article = self.create_test_article()
+        relevance_text = "AI agents are becoming more sophisticated in modern applications"
         
-        score, reasoning = scorer._score_article(article)
+        score, reasoning = scorer._score_article(article, relevance_text)
         
         assert score == 85
         assert reasoning == "High relevance to AI agents"
@@ -82,8 +83,9 @@ class TestRelevanceScorer:
         
         scorer = RelevanceScorer(config_path)
         article = self.create_test_article()
+        relevance_text = "AI agents are becoming more sophisticated in modern applications"
         
-        score, reasoning = scorer._score_article(article)
+        score, reasoning = scorer._score_article(article, relevance_text)
         
         assert score is None
         assert reasoning is None
@@ -107,8 +109,9 @@ class TestRelevanceScorer:
         
         scorer = RelevanceScorer(config_path)
         articles = [self.create_test_article(), self.create_test_article()]
+        relevance_text = "AI agents are becoming more sophisticated in modern applications"
         
-        scored_articles = scorer.score_articles(articles)
+        scored_articles = scorer.score_articles(articles, relevance_text)
         
         assert len(scored_articles) == 2
         assert all(isinstance(article, Article) for article in scored_articles)
@@ -162,8 +165,9 @@ class TestRelevanceScorer:
         
         scorer = RelevanceScorer(config_path)
         articles = [already_scored_article, unscored_article]
+        relevance_text = "AI agents are becoming more sophisticated in modern applications"
         
-        scored_articles = scorer.score_articles(articles)
+        scored_articles = scorer.score_articles(articles, relevance_text)
         
         # Verify results
         assert len(scored_articles) == 2
