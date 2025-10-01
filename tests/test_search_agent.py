@@ -13,7 +13,6 @@ class TestSearchAgent:
         """Mock configuration for SearchAgent."""
         return {
             "search_agent": {
-                "freshness": "last_24h",
                 "results_per_query": 5,
                 "max_results_for_summary": 25,
                 "chat_model": {
@@ -37,12 +36,13 @@ class TestSearchAgent:
         mock_load_config.return_value = mock_config
         mock_serpapi_instance = MagicMock()
         mock_serpapi_instance.results.return_value = {
-            "organic_results": [
+            "news_results": [
                 {
                     "title": "AI Agents Revolutionize Software Development",
                     "snippet": "New AI agents are transforming how developers build applications...",
                     "source": "techcrunch.com",
-                    "date": "2024-01-15"
+                    "date": "2024-01-15",
+                    "link": "https://techcrunch.com/ai-agents-revolutionize-software"
                 }
             ]
         }
@@ -60,7 +60,8 @@ class TestSearchAgent:
         assert results[0].title == "AI Agents Revolutionize Software Development"
         assert results[0].snippet == "New AI agents are transforming how developers build applications..."
         assert results[0].source == "techcrunch.com"
-        assert isinstance(results[0].published_date, datetime)
+        assert results[0].published_date == "2024-01-15"
+        assert str(results[0].link) == "https://techcrunch.com/ai-agents-revolutionize-software"
 
     @patch.dict('os.environ', {'SERPAPI_KEY': 'test_key', 'OPENAI_API_KEY': 'test_openai_key'})
     @patch('search.agent.load_config')
@@ -71,7 +72,7 @@ class TestSearchAgent:
         # Setup mocks
         mock_load_config.return_value = mock_config
         mock_serpapi_instance = MagicMock()
-        mock_serpapi_instance.results.return_value = {"organic_results": []}
+        mock_serpapi_instance.results.return_value = {"news_results": []}
         mock_serpapi_wrapper.return_value = mock_serpapi_instance
         
         # Create SearchAgent instance
@@ -126,7 +127,8 @@ class TestSearchAgent:
                 title="AI Agents Guide",
                 snippet="Comprehensive guide to AI agents",
                 source="example.com",
-                published_date=None
+                published_date="2024-01-15",
+                link="https://example.com/ai-agents-guide"
             )
         ]
         
@@ -179,7 +181,8 @@ class TestSearchAgent:
                 title="AI Agents Guide",
                 snippet="Comprehensive guide to AI agents",
                 source="example.com",
-                published_date=None
+                published_date="2024-01-15",
+                link="https://example.com/ai-agents-guide"
             )
         ]
         

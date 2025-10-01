@@ -188,15 +188,13 @@ scoring:
 ### Search Agent Configuration (`config/search_agent.yaml`)
 ```yaml
 search_agent:
-  engine: google_news
-  freshness: last_24h
   results_per_query: 5
   queries:
     - AI Agents
-    - LangChain agents
-    - autonomous AI agents
-    - multi-agent systems
-    - CrewAI OR AutoGen agents
+    - LangChain OR LangGraph
+    - Anthropic OR OpenAI
+    - LLM
+    - CrewAI OR AutoGen
 ```
 
 ### Post Creator Configuration (`config/post_creator.yaml`)
@@ -221,7 +219,6 @@ delivery:
 
 **Configuration Options:**
 - `delivery_time_utc`: UTC time for daily digest delivery (24-hour format)
-- `articles_freshness`: Time window for article selection (e.g., `last_24h`, `last_48h`)
 
 ### Telegram Configuration (`.env`)
 ```bash

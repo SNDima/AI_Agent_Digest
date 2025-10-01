@@ -15,6 +15,7 @@ from storage.article_storage import get_articles_after, update_relevance_scores
 from delivery import telegram
 from search.agent import SearchAgent
 from storage.summary_storage import save_search_summary
+from storage.search_result_storage import save_search_results
 from storage.delivery_storage import save_delivery, get_latest_delivery
 from models.delivery import Delivery
 from utils.constants import DATABASE_CONFIG_PATH, SOURCES_CONFIG_PATH, SEARCH_AGENT_CONFIG_PATH, DELIVERY_CONFIG_PATH, POST_CREATOR_CONFIG_PATH
@@ -101,6 +102,10 @@ def _make_summary() -> str | None:
         if not search_results:
             logging.warning("No search results found")
             return None
+        
+        # Save search results to database
+        logging.info(f"Saving {len(search_results)} search results to database...")
+        save_search_results(search_results, DATABASE_CONFIG_PATH)
         
         # Summarize search results
         summary_text = search_agent.summarize_all_results(search_results)

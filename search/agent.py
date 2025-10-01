@@ -4,15 +4,14 @@ Search agent module for performing web searches using SerpAPI and OpenAI summari
 
 import logging
 import os
-from typing import List, Optional
+from typing import List
 from datetime import datetime
-from dateutil import parser as date_parser
 
 from langchain_community.utilities import SerpAPIWrapper
 from langchain.chat_models import init_chat_model
 from utils.config import load_config
 from models.search_result import SearchResult
-from models.search_summary import SearchSummary
+from utils.constants import SEARCH_AGENT_CONFIG_PATH
 
 
 class SearchAgent:
@@ -39,63 +38,35 @@ class SearchAgent:
         
         # Initialize SerpAPI wrapper through LangChain
         search_config = self.config["search_agent"]
-        params = {"num": search_config["results_per_query"]}
-        
-        # Add engine parameter if specified in config
-        if "engine" in search_config:
-            params["engine"] = search_config["engine"]
+        params = {
+            "num": search_config["results_per_query"],
+            **search_config.get("serpapi_params", {})
+        }
             
         self.serpapi_wrapper = SerpAPIWrapper(
             serpapi_api_key=self.serpapi_key,
             params=params
         )
     
-    def _build_search_query(self, query: str) -> str:
-        """Build search query with freshness constraints."""
-        freshness = self.config["search_agent"]["freshness"]
-        
-        # Add freshness constraint to query if specified
-        if freshness == "last_24h":
-            return f"{query} (past 24 hours OR today)"
-        elif freshness == "last_7d":
-            return f"{query} (past week OR past 7 days)"
-        elif freshness == "last_30d":
-            return f"{query} (past month OR past 30 days)"
-        else:
-            return query
-    
-    def _parse_date(self, date_str: Optional[str]) -> Optional[datetime]:
-        """Parse date string from SerpAPI response into datetime object."""
-        if not date_str:
-            return None
-            
-        try:
-            return date_parser.parse(date_str)
-        except (ValueError, TypeError):
-            logging.warning(f"Could not parse published date: {date_str}")
-            return None
-    
     def search(self, query: str) -> List[SearchResult]:
         """Perform a web search for the given query."""
         logging.info(f"Searching for: {query}")
         
         try:
-            # Build query with freshness constraints
-            enhanced_query = self._build_search_query(query)
-            
             # Use SerpAPI wrapper to get structured results
-            results = self.serpapi_wrapper.results(enhanced_query)
+            results = self.serpapi_wrapper.results(query)
             
             search_results = []
             
-            raw_results = results.get("organic_results", [])
+            raw_results = results.get("news_results", [])
             
             for result in raw_results:                
                 search_results.append(SearchResult(
                     title=result.get("title", ""),
                     snippet=result.get("snippet", ""),
                     source=result.get("source", ""),
-                    published_date=self._parse_date(result.get("date"))
+                    published_date=result.get("date", ""),
+                    link=result.get("link", "")
                 ))
                 
             logging.info(f"Found {len(search_results)} results for query: {query}")
@@ -172,3 +143,35 @@ class SearchAgent:
         """Generate a summary of search results using all configured queries."""
         combined_query = self.get_combined_query()
         return self.summarize_results(results, combined_query)
+
+
+# to test locally
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
+
+    try:
+        # Initialize search agent
+        search_agent = SearchAgent(SEARCH_AGENT_CONFIG_PATH)
+        
+        # Search for "AI Agents"
+        query = "AI Agents"
+        results = search_agent.search(query)
+        
+        # Log detailed results
+        logging.info(f"Search results for '{query}':")
+        logging.info(f"Total results found: {len(results)}")
+        
+        # Sort results by published_date in descending order (newest first)
+        sorted_results = sorted(results, key=lambda x: x.published_date or datetime.min, reverse=True)
+        
+        # Log title and posted date for each result
+        for i, result in enumerate(sorted_results, 1):
+            published_date_str = result.published_date.strftime("%Y-%m-%d %H:%M:%S") if result.published_date else "No date"
+            logging.info(f"{i}. {result.title} - Posted: {published_date_str}")
+        
+    except (FileNotFoundError, ValueError) as e:
+        logging.critical(str(e))
+        raise
